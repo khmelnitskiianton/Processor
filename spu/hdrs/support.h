@@ -1,5 +1,5 @@
-#ifndef SPU_SUPPORT_H
-#define SPU_SUPPORT_H
+#ifndef SUPPORT_H
+#define SUPPORT_H
 
 Elem_t* expansion      (Stack_t *stk);
 Elem_t* comprassion    (Stack_t *stk);

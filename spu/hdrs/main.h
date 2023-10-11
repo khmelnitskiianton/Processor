@@ -1,13 +1,5 @@
-#ifndef HEAD_H
-#define HEAD_H
-
-#include <stdio.h>
-#include <assert.h>
-#include <stdlib.h>
-#include <limits.h> 
-#include <string.h>
-#include <stddef.h>
-#include <math.h>
+#ifndef MAIN_H
+#define MAIN_H
 
 #define ASSERT_MYSTACK 1
 #define DEBUG_PRINTING 0
@@ -51,14 +43,9 @@ const int    MIN_LEN = 10;
 
 #define EPSILONE 1e-10
 
-#include "spu_math.h"
-#include "spu_stack.h"
-#include "spu_support.h"
-#include "asm.h"
 
-#define FILE_IN_TEXT "input_text.txt"
-#define FILE_IN_NUM  "input_num.txt"
-#define FILE_OUT     "output.txt"
+#define FILE_IN  "D:/Study/C/Processor/input_num.txt"
+#define FILE_OUT "D:/Study/C/Processor/output.txt"
 
 enum math_codes {
     HLT  = -1,

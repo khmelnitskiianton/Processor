@@ -1,5 +1,5 @@
-#ifndef SPU_MATH_H
-#define SPU_MATH_H
+#ifndef MATH_H
+#define MATH_H
 
 int do_command   (Stack_t* stk, int command, Elem_t argument);
 int print_result (Stack_t* stk);

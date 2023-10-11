@@ -1,26 +1,33 @@
-#include "head.h"
+#include <stdio.h>
+#include <assert.h>
+#include <string.h>
+#include <limits.h>
+#include <math.h>
 
-FILE* file_read_asm (void)
+#include "main.h"
+#include "asm.h"
+
+FILE* file_open_read (void)
 {
     FILE *file_read = nullptr;
-    if ((file_read = fopen (FILE_IN_TEXT, "rb")) == nullptr) 
+    if ((file_read = fopen (FILE_IN, "rb")) == nullptr) 
     {
         assert(0);
     }
     return file_read;
 }
 
-FILE* file_write_asm (void)
+FILE* file_open_write (void)
 {
     FILE *file_out = nullptr;
-    if ((file_out = fopen (FILE_IN_NUM, "wb")) == nullptr) 
+    if ((file_out = fopen (FILE_OUT, "wb")) == nullptr) 
     {
         assert(0);
     }
     return file_out;
 }
 
-int file_close_asm (FILE *file_text)
+int file_close (FILE *file_text)
 {
 	if (!file_text)
 	{

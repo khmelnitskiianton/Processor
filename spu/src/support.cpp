@@ -1,4 +1,15 @@
-#include "head.h"
+#include <stdio.h>
+#include <assert.h>
+#include <limits.h> 
+#include <string.h>
+#include <stddef.h>
+#include <math.h>
+#include <stdlib.h>
+
+#include "main.h"
+#include "calc.h"
+#include "stack.h"
+#include "support.h"
 
 Elem_t* expansion (Stack_t *stk)
 {
@@ -178,7 +189,7 @@ int degree(int a, int b)
 FILE* file_rb_open (void)
 {
     FILE *file_read = nullptr;
-    if ((file_read = fopen (FILE_IN_NUM, "rb")) == nullptr) 
+    if ((file_read = fopen (FILE_IN, "rb")) == nullptr) 
     {
         assert(0);
     }

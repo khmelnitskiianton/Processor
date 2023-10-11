@@ -1,4 +1,15 @@
-#include "head.h"
+#include <stdio.h>
+#include <assert.h>
+#include <limits.h> 
+#include <string.h>
+#include <stddef.h>
+#include <math.h>
+#include <stdlib.h>
+
+#include "main.h"
+#include "calc.h"
+#include "stack.h"
+#include "support.h"
 
 int main(void)
 {

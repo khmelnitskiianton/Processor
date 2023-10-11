@@ -1,4 +1,15 @@
-#include "head.h"
+#include <stdio.h>
+#include <assert.h>
+#include <limits.h> 
+#include <string.h>
+#include <stddef.h>
+#include <math.h>
+#include <stdlib.h>
+
+#include "main.h"
+#include "calc.h"
+#include "stack.h"
+#include "support.h"
 
 int do_command(Stack_t* stk, int command, Elem_t argument)
 {
@@ -68,6 +79,7 @@ int print_result (Stack_t* stk)
 int in (Stack_t* stk)
 {
     Elem_t num = POISON_ELEMENT;
+    printf("Enter value please to put in stack: ");
     while(scanf (SPECIFIER, &num) != 1)
     {   
         clean_buffer ();

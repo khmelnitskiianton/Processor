@@ -1,9 +1,16 @@
-#include "head.h"
+#include <stdio.h>
+#include <assert.h>
+#include <string.h>
+#include <limits.h>
+#include <math.h>
+
+#include "main.h"
+#include "asm.h"
 
 int main(void)
-{
-    FILE* file_read  = file_read_asm  ();
-    FILE* file_write = file_write_asm ();
+{ 
+    FILE* file_read  = file_open_read  ();
+    FILE* file_write = file_open_write ();
     int ch = NULL;
     char command[10] = {};
     Elem_t argument = POISON_ELEMENT;
@@ -35,7 +42,7 @@ int main(void)
         }
         i = 0;
     }
-    file_close_asm(file_read);
-    file_close_asm(file_write);
+    file_close (file_read);
+    file_close (file_write);
     return 0;
 }
