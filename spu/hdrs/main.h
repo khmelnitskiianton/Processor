@@ -22,8 +22,8 @@
 #define ON_PRINTING(...) 
 #endif
 
-typedef double Elem_t;
-#define SPECIFIER "%lf"
+typedef int Elem_t;
+#define SPECIFIER "%d"
 
 typedef struct Stack {
     Elem_t    *data;
@@ -36,7 +36,7 @@ typedef struct Stack {
 
 } Stack_t;
 
-const Elem_t POISON_ELEMENT = NAN;
+const Elem_t POISON_ELEMENT = NULL;
 const int    N_ERRORS = 8;
 const int    MULTIPLIER = 2;
 const int    MIN_LEN = 10;
@@ -44,21 +44,7 @@ const int    MIN_LEN = 10;
 #define EPSILONE 1e-10
 
 
-#define FILE_IN  "D:/Study/C/Processor/input_num.txt"
+#define FILE_IN  "D:/Study/C/Processor/input_bin.txt"
 #define FILE_OUT "D:/Study/C/Processor/output.txt"
-
-enum math_codes {
-    HLT  = -1,
-    OUT  = 0,
-    PUSH = 1,
-    IN   = 2,
-    SUB  = 3,
-    DIV  = 4,
-    ADD  = 5,
-    MUL  = 6,
-    SQRT = 7,
-    SIN  = 8,
-    COS  = 9,
-};
 
 #endif 

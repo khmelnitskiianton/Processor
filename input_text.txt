@@ -7,5 +7,6 @@ in
 mul
 mul
 sub
+pop rcx
 out
 hlt
