@@ -223,7 +223,7 @@ FILE* file_open_read (void)
 FILE* file_open_write (void)
 {
     FILE *file_out = nullptr;
-    if ((file_out = fopen (FILE_OUT, "w")) == nullptr) 
+    if ((file_out = fopen (FILE_OUT, "wb")) == nullptr) 
     {
         assert(0);
     }

@@ -83,5 +83,5 @@ const RegID_t REGISTERS[] = {
 
 const size_t AMOUNT_OF_COMMANDS  = sizeof(COMMANDS)  / sizeof(BinCommand);
 const size_t AMOUNT_OF_REGISTERS = sizeof(REGISTERS) / sizeof(RegID_t);
-
+  
 #endif 
