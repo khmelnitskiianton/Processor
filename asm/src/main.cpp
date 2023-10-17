@@ -8,7 +8,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include "commands.h"
+#include "arrays.h"
 #include "type.h"
 #include "main.h"
 #include "buffer.h"
@@ -23,5 +23,6 @@ int main(void)
     txt_to_asm (&asmCode);
 
     bufferDtor (&asmCode);
+    
     return 0;
 }

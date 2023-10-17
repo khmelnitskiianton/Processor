@@ -7,7 +7,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include "commands.h"
+
+#include "arrays.h"
 #include "type.h"
 #include "main.h"
 #include "calc.h"
@@ -35,10 +36,6 @@ int bufferCtor (Spu_t *mySpu)
 		assert(0);
 	}
 	size_t result = fread (mySpu -> myBuffer.text_buffer, 1, mySpu -> myBuffer.size_text, mySpu -> myBuffer.file_in);
-	if (result != (mySpu -> myBuffer.size_text - 1))
-	{
-		assert(0);
-	}
 	mySpu -> actual_command = mySpu -> myBuffer.text_buffer;
     return 1;
 }

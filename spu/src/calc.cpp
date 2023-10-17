@@ -7,7 +7,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include "commands.h"
+#include "arrays.h"
 #include "type.h"
 #include "main.h"
 #include "calc.h"
@@ -25,7 +25,6 @@ int process_asm (Spu_t *mySpu)
             break;
         }
         else (mySpu -> actual_command)++;
-
     ON_PRINTING(
         printing_stack (&(mySpu -> myStack), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     )
@@ -37,20 +36,13 @@ int do_command (Spu_t* mySpu, int command)
 {
     switch(command)
     {
-        case (COMMANDS[PUSH_NUM].bin_code):      push_num     (mySpu);                   break;
-        case COMMANDS[PUSH_REG].bin_code:      push_reg     (mySpu);                   break;
-        case COMMANDS[POP_REG].bin_code:       pop_reg      (mySpu);                   break;
-        case COMMANDS[IN].bin_code:            in           (mySpu);                   break;
-        case COMMANDS[DIV].bin_code:           div          (mySpu);                   break;
-        case COMMANDS[ADD].bin_code:           add          (mySpu);                   break;
-        case COMMANDS[MUL].bin_code:           mul          (mySpu);                   break;
-        case COMMANDS[SQRT].bin_code:          mysqrt       (mySpu);                   break;
-        case COMMANDS[SUB].bin_code:           sub          (mySpu);                   break;
-        case COMMANDS[COS].bin_code:           mycos        (mySpu);                   break;
-        case COMMANDS[SIN].bin_code:           mysin        (mySpu);                   break;
-        case COMMANDS[OUT].bin_code:           print_result (mySpu);                   break;
-        case COMMANDS[HLT].bin_code:           return 1;                               break;
+        #define DEF_CMD(name, name_full, num, bin_num, ...)             \
+            case COMMANDS[name_full].bin_code: __VA_ARGS__ break; 
+            
+        #include "commands.h"
 
+        #undef DEF_CMD       
+        
         default: 
         {
             fprintf(stdout, "\n<<<<<<<!YOU HAVE ERROR!>>>>>>\n<<<<<<!UNKNOWN CODE!>>>>>>\n");
