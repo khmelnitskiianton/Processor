@@ -22,29 +22,38 @@
 #define ON_PRINTING(...) 
 #endif
 
-typedef int Elem_t;
-#define SPECIFIER "%d"
-
 typedef struct Stack {
-    Elem_t    *data;
-    int       size;
-    int       capacity; 
+    Elem_t*  data;
+    int      size;
+    int      capacity; 
+    int      ret_value;
 
-    int       ret_value;
-    FILE*     file_in;
-    FILE*     file_out;
-
+    FILE*    file_in;
+    FILE*    file_out;
 } Stack_t;
 
-const Elem_t POISON_ELEMENT = NULL;
-const int    N_ERRORS = 8;
-const int    MULTIPLIER = 2;
-const int    MIN_LEN = 10;
+typedef struct BufferSpu {
+    FILE*    file_in;
+    FILE*    file_out;
 
-#define EPSILONE 1e-10
+    size_t   size_text;
+    Elem_t*  text_buffer;
+} BufferSpu_t;
 
+typedef struct Spu {
+    Stack_t     myStack;
+    BufferSpu_t myBuffer;
 
-#define FILE_IN  "D:/Study/C/Processor/input_bin.txt"
-#define FILE_OUT "D:/Study/C/Processor/output.txt"
+    Elem_t*     actual_command;
+
+    Elem_t      rax;
+    Elem_t      rbx; 
+    Elem_t      rcx;
+    Elem_t      rdx; 
+} Spu_t;
+
+const int N_ERRORS = 8;
+const int MULTIPLIER = 2;
+const int MIN_LEN = 5;
 
 #endif 

@@ -1,13 +1,17 @@
 #include <stdio.h>
 #include <assert.h>
-#include <limits.h> 
 #include <string.h>
-#include <stddef.h>
+#include <limits.h>
 #include <math.h>
 #include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
+#include "commands.h"
+#include "type.h"
 #include "main.h"
 #include "calc.h"
+#include "buffer.h"
 #include "stack.h"
 #include "support.h"
 
@@ -18,7 +22,7 @@ Elem_t* expansion (Stack_t *stk)
     if ((new_place = realloc ((stk -> data), sizeof(Elem_t)*(stk -> capacity))) == nullptr)
     {   
         fprintf(stdout,            "ERROR IN RECALLOC IN %s", __PRETTY_FUNCTION__);
-        fprintf(stk -> file_out, "ERROR IN RECALLOC IN %s", __PRETTY_FUNCTION__);  
+        fprintf(stk -> file_out,   "ERROR IN RECALLOC IN %s", __PRETTY_FUNCTION__);  
         abort();
     }
                                                  
@@ -184,37 +188,4 @@ int degree(int a, int b)
         x = x * a;
     }
     return x;
-}
-
-FILE* file_rb_open (void)
-{
-    FILE *file_read = nullptr;
-    if ((file_read = fopen (FILE_IN, "rb")) == nullptr) 
-    {
-        assert(0);
-    }
-    return file_read;
-}
-
-FILE* file_wb_open (void)
-{
-    FILE *file_out = nullptr;
-    if ((file_out = fopen (FILE_OUT, "wb")) == nullptr) 
-    {
-        assert(0);
-    }
-    return file_out;
-}
-
-int file_close (FILE *file_text)
-{
-	if (!file_text)
-	{
-		assert(0);
-	}
-	if (fclose (file_text) != 0)
-	{
-		assert(0);
-	}
-	return 1;
 }

@@ -1,20 +1,24 @@
 #include <stdio.h>
 #include <assert.h>
-#include <limits.h> 
 #include <string.h>
-#include <stddef.h>
+#include <limits.h>
 #include <math.h>
 #include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
+#include "commands.h"
+#include "type.h"
 #include "main.h"
 #include "calc.h"
+#include "buffer.h"
 #include "stack.h"
 #include "support.h"
 
-int StackCtor (Stack_t *stk)
+int StackCtor (Stack_t *stk, BufferSpu_t *bffr)
 {
-    stk -> file_in  = file_rb_open ();
-	stk -> file_out = file_wb_open ();
+    stk -> file_in  = bffr -> file_in;
+	stk -> file_out = bffr -> file_out;
     stk -> size = 0; 
     stk -> capacity = 1;
     stk -> ret_value = 1;
@@ -82,8 +86,8 @@ int StackDtor (Stack_t *stk)
     ASSERT_STACK(stk, __PRETTY_FUNCTION__)
 
     free(stk -> data);
-    file_close(stk -> file_in);
-    file_close(stk -> file_out);
+    stk -> file_in  = NULL;
+    stk -> file_out = NULL;
     stk -> data = NULL;
     stk = NULL;
     return 1;
@@ -109,4 +113,3 @@ int printing_stack (Stack_t* stk, const char* file, const size_t line, const cha
             "}   \n");
     return 1;
 }
-

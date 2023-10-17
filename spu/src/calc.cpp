@@ -1,156 +1,232 @@
 #include <stdio.h>
 #include <assert.h>
-#include <limits.h> 
 #include <string.h>
-#include <stddef.h>
+#include <limits.h>
 #include <math.h>
 #include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
+#include "commands.h"
+#include "type.h"
 #include "main.h"
 #include "calc.h"
+#include "buffer.h"
 #include "stack.h"
 #include "support.h"
 
-int do_command(Stack_t* stk, int command, Elem_t argument)
+int process_asm (Spu_t *mySpu)
+{
+    int checkOk = 1;
+    while (checkOk)
+    {
+        if (do_command (mySpu, (int) *(mySpu -> actual_command))) 
+        {
+            break;
+        }
+        else (mySpu -> actual_command)++;
+
+    ON_PRINTING(
+        printing_stack (&(mySpu -> myStack), __FILE__, __LINE__, __PRETTY_FUNCTION__);
+    )
+    }
+    return 1;
+}
+
+int do_command (Spu_t* mySpu, int command)
 {
     switch(command)
     {
-        case HLT:
-            return 1;
-        break;
-
-        case OUT:
-            print_result(stk);
-        break;
-
-        case PUSH:
-            push(stk, argument);
-        break;
-        
-        case IN:
-            in (stk);
-        break;
-
-        case SUB:
-            sub (stk);
-        break;
-
-        case DIV:
-            div (stk);
-        break;
-
-        case ADD:
-            add (stk);
-        break;
-
-        case MUL:
-            mul (stk);
-        break;
-
-        case SQRT:
-            sqrt_stk (stk);
-        break;
-
-        case SIN:
-            sin_stk (stk);
-        break;
-
-        case COS:
-            cos_stk (stk);
-        break;
+        case (COMMANDS[PUSH_NUM].bin_code):      push_num     (mySpu);                   break;
+        case COMMANDS[PUSH_REG].bin_code:      push_reg     (mySpu);                   break;
+        case COMMANDS[POP_REG].bin_code:       pop_reg      (mySpu);                   break;
+        case COMMANDS[IN].bin_code:            in           (mySpu);                   break;
+        case COMMANDS[DIV].bin_code:           div          (mySpu);                   break;
+        case COMMANDS[ADD].bin_code:           add          (mySpu);                   break;
+        case COMMANDS[MUL].bin_code:           mul          (mySpu);                   break;
+        case COMMANDS[SQRT].bin_code:          mysqrt       (mySpu);                   break;
+        case COMMANDS[SUB].bin_code:           sub          (mySpu);                   break;
+        case COMMANDS[COS].bin_code:           mycos        (mySpu);                   break;
+        case COMMANDS[SIN].bin_code:           mysin        (mySpu);                   break;
+        case COMMANDS[OUT].bin_code:           print_result (mySpu);                   break;
+        case COMMANDS[HLT].bin_code:           return 1;                               break;
 
         default: 
-        fprintf(stdout,          "\n<<<<<<<!YOU HAVE ERROR!>>>>>>\n<<<<<<!UNKNOWN CODE!>>>>>>");
-        fprintf(stk -> file_out, "\n<<<<<<<!YOU HAVE ERROR!>>>>>>\n<<<<<<!UNKNOWN CODE!>>>>>>");
-        abort();
+        {
+            fprintf(stdout, "\n<<<<<<<!YOU HAVE ERROR!>>>>>>\n<<<<<<!UNKNOWN CODE!>>>>>>\n");
+            fprintf(mySpu -> myBuffer.file_out, "\n<<<<<<<!YOU HAVE ERROR!>>>>>>\n<<<<<<!UNKNOWN CODE!>>>>>>");
+            file_close(mySpu -> myBuffer.file_out);
+            abort(); 
+        }
         break;
     }       
     return 0;
 }
 
-int print_result (Stack_t* stk)
+int print_result (Spu_t* mySpu)
 {
     Elem_t result = POISON_ELEMENT;
-    pop (stk, &result);
-    fprintf (stk -> file_out, SPECIFIER, result);
+    pop (&(mySpu -> myStack), &result);
+
+    if ((mySpu -> myStack.size) > 0) printf("\n\n>>>WARNING<<<\nYour Stack is not empty now!!!\n\n"); 
+ON_DOUBLE(
+    fprintf (mySpu -> myBuffer.file_out, "%lf", result);
+)
+ON_INT(
+    fprintf (mySpu -> myBuffer.file_out, "%lf", ((double) result) / N_DIGIT);
+)
     return 1;
 }
 
-int in (Stack_t* stk)
+int push_num (Spu_t *mySpu)
 {
-    Elem_t num = POISON_ELEMENT;
+    Elem_t value = *(++(mySpu -> actual_command));
+    if (!COMPARE_TYPE(value, POISON_ELEMENT)) push (&(mySpu -> myStack), value);
+    else printf("\n\n>>>WARNING<<<\nVALUE == NULL!!!\n\n");
+    return 1;
+}
+
+int push_reg (Spu_t *mySpu)
+{
+    int n_reg = (int) *(++(mySpu -> actual_command));
+    if (n_reg != NULL) 
+    {
+        switch (n_reg)
+        {
+            case 1:         push(&(mySpu -> myStack), mySpu -> rax);            break; 
+            case 2:         push(&(mySpu -> myStack), mySpu -> rbx);            break;
+            case 3:         push(&(mySpu -> myStack), mySpu -> rcx);            break;
+            case 4:         push(&(mySpu -> myStack), mySpu -> rdx);            break;
+        }
+    }
+    else printf("\n\n>>>WARNING<<<\nREG NUMBER == NULL!!!\n\n");
+    return 1;
+}
+
+int pop_reg (Spu_t *mySpu)
+{
+    int n_reg = (int) *(++(mySpu -> actual_command));
+    if (n_reg != NULL) 
+    {
+        switch (n_reg)
+        {
+            case 1:         pop(&(mySpu -> myStack), &(mySpu -> rax));          break;
+            case 2:         pop(&(mySpu -> myStack), &(mySpu -> rbx));          break;
+            case 3:         pop(&(mySpu -> myStack), &(mySpu -> rcx));          break;
+            case 4:         pop(&(mySpu -> myStack), &(mySpu -> rdx));          break;
+        }
+    }
+    else printf("\n\n>>>WARNING<<<\nREG NUMBER == NULL!!!\n\n");
+    return 1;
+}
+
+int in (Spu_t* mySpu)
+{
+    double num = POISON_ELEMENT;
     printf("Enter value please to put in stack: ");
-    while(scanf (SPECIFIER, &num) != 1)
+    while(scanf ("%lf", &num) != 1)
     {   
         clean_buffer ();
         printf ("\nWtf? Its not normal double number. Maybe it is infinite/NAN number or letters. Another attempt you piece of shit, hey you, MAAAAN!\n");
     }
-    push (stk, num);
+ON_DOUBLE(
+    push (&(mySpu -> myStack), num);
+)
+ON_INT(
+    push (&(mySpu -> myStack), (int) (num * N_DIGIT));
+)
     return 1;
 }
 
-int sub (Stack_t* stk)
+int sub (Spu_t* mySpu)
 {
     Elem_t x = POISON_ELEMENT;
     Elem_t y = POISON_ELEMENT;
-    pop(stk, &y);
-    pop(stk, &x);
-    push(stk, x - y);
+    pop(&(mySpu -> myStack), &y);
+    pop(&(mySpu -> myStack), &x);
+    push(&(mySpu -> myStack), x - y);
     return 1;
 }
 
-int add (Stack_t* stk)
+int add (Spu_t* mySpu)
 {
     Elem_t x = POISON_ELEMENT;
     Elem_t y = POISON_ELEMENT;
-    pop(stk, &y);
-    pop(stk, &x);
-    push(stk, x + y);
+    pop(&(mySpu -> myStack), &y);
+    pop(&(mySpu -> myStack), &x);
+    push(&(mySpu -> myStack), x + y);
     return 1;
 }
 
-int div (Stack_t* stk)
+int div (Spu_t* mySpu)
 {
     Elem_t x = POISON_ELEMENT;
     Elem_t y = POISON_ELEMENT;
-    pop(stk, &y);
-    pop(stk, &x);
-    push(stk, x / y);
+    pop(&(mySpu -> myStack), &y);
+    pop(&(mySpu -> myStack), &x);
+ON_DOUBLE(
+    push(&(mySpu -> myStack), x / y);
+)
+ON_INT(
+    push(&(mySpu -> myStack), (x * N_DIGIT) / y);
+)
     return 1;
 }
 
-int mul (Stack_t* stk)
+int mul (Spu_t* mySpu)
 {
     Elem_t x = POISON_ELEMENT;
     Elem_t y = POISON_ELEMENT;
-    pop(stk, &y);
-    pop(stk, &x);
-    push(stk, x * y);
+    pop(&(mySpu -> myStack), &y);
+    pop(&(mySpu -> myStack), &x);
+ON_DOUBLE(
+    push(&(mySpu -> myStack), x * y);
+)
+ON_INT(
+    push(&(mySpu -> myStack), x * y / N_DIGIT);
+)
     return 1;
 }
 
-int sqrt_stk (Stack_t* stk)
+int mysqrt (Spu_t* mySpu)
 {
     Elem_t x = POISON_ELEMENT;
-    pop(stk, &x);
-    if (x >= 0)
-    push(stk, sqrt(x));
+    pop(&(mySpu -> myStack), &x);
+ON_DOUBLE(
+    if (x >= 0) push(&(mySpu -> myStack), sqrt(x));
+)
+ON_INT(
+    double z =  sqrt(((double) x) / N_DIGIT);
+    if (x >= 0) push(&(mySpu -> myStack), (int) (z * N_DIGIT));
+)
     return 1;
 }
 
-int sin_stk (Stack_t* stk)
+int mysin (Spu_t* mySpu)
 {
     Elem_t x = POISON_ELEMENT;
-    pop(stk, &x);
-    push(stk, sin(x));
+    pop(&(mySpu -> myStack), &x);
+ON_DOUBLE(
+    push(&(mySpu -> myStack), sin(x));
+)
+ON_INT(
+    double z =  sin(((double) x) / N_DIGIT);
+    push(&(mySpu -> myStack), (int) (z * N_DIGIT));
+)
     return 1;
 }
 
-int cos_stk (Stack_t* stk)
+int mycos (Spu_t* mySpu)
 {
     Elem_t x = POISON_ELEMENT;
-    pop(stk, &x);
-    push(stk, cos(x));
+    pop(&(mySpu -> myStack), &x);
+ON_DOUBLE(
+    push(&(mySpu -> myStack), cos(x));
+)
+ON_INT(
+    double z =  cos(((double) x) / N_DIGIT);
+    push(&(mySpu -> myStack), (int) (z * N_DIGIT));
+)
     return 1;
 }
 

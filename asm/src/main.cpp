@@ -3,17 +3,20 @@
 #include <string.h>
 #include <limits.h>
 #include <math.h>
+#include <ctype.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 
 #include "commands.h"
+#include "type.h"
 #include "main.h"
+#include "buffer.h"
 #include "asm.h"
 
 int main(void)
 { 
-    Buffer_t asmCode = {};
+    BufferAsm_t asmCode = {};
     bufferCtor (&asmCode);
 
     arrOfptr   (&asmCode);
