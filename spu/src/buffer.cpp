@@ -7,7 +7,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-
 #include "arrays.h"
 #include "type.h"
 #include "main.h"
@@ -16,7 +15,7 @@
 #include "stack.h"
 #include "support.h"
 
-int bufferCtor (Spu_t *mySpu)
+int BufferCtor (Spu_t *mySpu)
 {
     mySpu -> myBuffer.file_in  = file_open_read  ();
     mySpu -> myBuffer.file_out = file_open_write ();
@@ -36,11 +35,15 @@ int bufferCtor (Spu_t *mySpu)
 		assert(0);
 	}
 	size_t result = fread (mySpu -> myBuffer.text_buffer, 1, mySpu -> myBuffer.size_text, mySpu -> myBuffer.file_in);
+	if (result != (mySpu -> myBuffer.size_text - 1))
+	{
+		assert(0);
+	}
 	mySpu -> actual_command = mySpu -> myBuffer.text_buffer;
     return 1;
 }
 
-int bufferDtor (Spu_t *mySpu)
+int BufferDtor (Spu_t *mySpu)
 {
     free(mySpu -> myBuffer.text_buffer);
 

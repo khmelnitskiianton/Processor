@@ -4,8 +4,10 @@ mul
 push 4
 in
 in
+:next
 mul
 mul
+jmp next 
 sub
 out
 hlt

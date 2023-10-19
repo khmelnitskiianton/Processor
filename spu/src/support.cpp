@@ -189,3 +189,17 @@ int degree(int a, int b)
     }
     return x;
 }
+
+int SpuCtor(Spu_t* mySpu)
+{
+    BufferCtor (mySpu);
+    StackCtor  (&(mySpu -> myStack), &(mySpu -> myBuffer));
+    return 1;
+}
+
+int SpuDtor(Spu_t* mySpu)
+{
+    BufferDtor (mySpu);
+    StackDtor  (&(mySpu -> myStack));
+    return 1;
+}

@@ -5,8 +5,12 @@ FILE*  file_open_read  (void);
 FILE*  file_open_write (void);
 int    file_close      (FILE* file_text);
 size_t text_size       (FILE *file_text);
-int    bufferCtor      (BufferAsm_t *asmCode);
-int    bufferDtor      (BufferAsm_t *asmCode);
-int    arrOfptr        (BufferAsm_t *asmCode);
+int    BufferTextCtor  (Asm_t *myAsm);
+int    BufferTextDtor  (Asm_t *myAsm);
+int    arrOfptr        (Asm_t *myAsm);
+int    BufferBinCtor   (Asm_t *myAsm);
+int    BufferBinDtor   (Asm_t *myAsm);
+int    AsmCtor         (Asm_t *myAsm);
+int    AsmDtor         (Asm_t *myAsm);
 
 #endif

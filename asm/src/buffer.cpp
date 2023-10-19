@@ -11,105 +11,127 @@
 #include "arrays.h"
 #include "type.h"
 #include "main.h"
+#include "support.h"
 #include "buffer.h"
 #include "asm.h"
 
-int bufferCtor (BufferAsm_t *asmCode)
+int BufferTextCtor (Asm_t *myAsm)
 {
-    asmCode -> file_in  = file_open_read  ();
-    asmCode -> file_out = file_open_write ();
+    (myAsm -> asmCode).file_in  = file_open_read  ();
+    (myAsm -> asmCode).file_out = file_open_write ();
 
-    if (!(asmCode -> file_in))
+    if (!((myAsm -> asmCode).file_in))
 	{
 		assert(0);
 	}
-	if (!(asmCode -> file_out))
+	if (!((myAsm -> asmCode).file_out))
 	{
 		assert(0);
 	}
-    ssize_t size_text_rubbish = text_size (asmCode -> file_in) + 1;
+    ssize_t size_text_rubbish = text_size ((myAsm -> asmCode).file_in) + 1;
     char* text_buffer_rubbish = nullptr;
-    text_buffer_rubbish = (char*) calloc (size_text_rubbish, sizeof (char));
-	fread (text_buffer_rubbish, 1, size_text_rubbish, asmCode -> file_in);
+    if ((text_buffer_rubbish = (char*) calloc (size_text_rubbish, sizeof (char))) == nullptr)
+	{
+		assert(0);
+	}
+	fread (text_buffer_rubbish, 1, size_text_rubbish, (myAsm -> asmCode).file_in);
     *(text_buffer_rubbish + size_text_rubbish - 1) = '\0';
 
     char *symbol = text_buffer_rubbish;
 	size_t p = 0;
-    asmCode -> size_text = 0;
+    (myAsm -> asmCode).size_text = 0;
     while (*(symbol + p) != '\0')
     {
-        if (*(symbol + p) != '\r') (asmCode -> size_text)++;
-        p++;
+        if (*(symbol + p) == '\r') 
+		{
+			p++;
+			continue;
+		}
+		if ((*(symbol + p) == '\n') && (*(symbol + p + 1) == '\n')) 
+		{ 
+			p++; 		
+			continue;
+		}
+        ((myAsm -> asmCode).size_text)++;
+		p++;
     }
-    (asmCode -> size_text)++;
-	asmCode -> text_buffer = nullptr;
-	if ((asmCode -> text_buffer = (char*) calloc (asmCode -> size_text, sizeof (char))) == nullptr)
+    ((myAsm -> asmCode).size_text)++;
+	(myAsm -> asmCode).text_buffer = nullptr;
+	if (((myAsm -> asmCode).text_buffer = (char*) calloc ((myAsm -> asmCode).size_text, sizeof (char))) == nullptr)
 	{
 		assert(0);
 	}
     int ptr_orig = 0;
     int ptr_rubb = 0;
-	while (ptr_rubb <  size_text_rubbish)
+	while (ptr_rubb < size_text_rubbish)
     {
-        if (*(text_buffer_rubbish + ptr_rubb) != '\r') 
+        if (*(text_buffer_rubbish + ptr_rubb) == '\r') 
         {
-            *(asmCode -> text_buffer + ptr_orig) = *(text_buffer_rubbish + ptr_rubb);
-            ptr_orig++;
+            ptr_rubb++;
+			continue;
         }
-        ptr_rubb++;
+		if ((*(text_buffer_rubbish + ptr_rubb) == '\n') && (*(text_buffer_rubbish + ptr_rubb + 1) == '\n'))
+		{
+			ptr_rubb++;
+			continue;
+		}
+		*((myAsm -> asmCode).text_buffer + ptr_orig) = *(text_buffer_rubbish + ptr_rubb);
+        ptr_orig++;
+		ptr_rubb++;
     }
+
+	(myAsm -> asmCode).n_strings = 0;
+	for (size_t i = 0; i < ((myAsm -> asmCode).size_text); i++)
+    {
+        if ((*(((myAsm -> asmCode).text_buffer) + i) == '\n') || (*(((myAsm -> asmCode).text_buffer) + i) == '\0'))
+        {
+            (myAsm -> asmCode).n_strings += 1;
+        }
+        if (*(((myAsm -> asmCode).text_buffer) + i) == '\n')
+        {
+            *(((myAsm -> asmCode).text_buffer) + i) = '\0';
+        }
+    }
+
     free(text_buffer_rubbish);
     return 1;
 }
 
-int bufferDtor (BufferAsm_t *asmCode)
+int BufferTextDtor (Asm_t *myAsm)
 {
-    free(asmCode -> text_buffer);
-	free(asmCode -> string_buffer);
+    free((myAsm -> asmCode).text_buffer);
+	free((myAsm -> asmCode).string_buffer);
 
-	file_close(asmCode -> file_in);
-	file_close(asmCode -> file_out);
+	file_close((myAsm -> asmCode).file_in);
+	file_close((myAsm -> asmCode).file_out);
 	return 1;
 }
 
-int arrOfptr (BufferAsm_t *asmCode)
+int arrOfptr (Asm_t *myAsm)
 {
-    asmCode -> n_strings = 0;
-	for (size_t i = 0; i < (asmCode -> size_text); i++)
-    {
-        if ((*((asmCode -> text_buffer) + i) == '\n') || (*((asmCode -> text_buffer) + i) == '\0'))
-        {
-            asmCode -> n_strings += 1;
-        }
-        if (*((asmCode -> text_buffer) + i) == '\n')
-        {
-            *((asmCode -> text_buffer) + i) = '\0';
-        }
-    }
-
-	asmCode -> string_buffer = nullptr;
-	if ((asmCode -> string_buffer  = (Line*) calloc (asmCode -> n_strings+1, sizeof (Line))) == nullptr)
+	(myAsm -> asmCode).string_buffer = nullptr;
+	if (((myAsm -> asmCode).string_buffer  = (Line*) calloc ((myAsm -> asmCode).n_strings+1, sizeof (Line))) == nullptr)
 	{
 		assert(0);
 	}
-	char *symbol = asmCode -> text_buffer;
+	char *symbol = (myAsm -> asmCode).text_buffer;
 	size_t p = 0;
 	size_t amount = 0;
 	size_t length = 0;
-	(*(asmCode -> string_buffer)).start_line = asmCode -> text_buffer;
-	while (amount < (asmCode -> n_strings))
+	(*((myAsm -> asmCode).string_buffer)).start_line = (myAsm -> asmCode).text_buffer;
+	while (amount < ((myAsm -> asmCode).n_strings))
 	{
 		length++;
 		if ((*(symbol + p) == '\0'))
 		{
-			(*(asmCode -> string_buffer + amount)).len = length-2;
+			(*((myAsm -> asmCode).string_buffer + amount)).len = length-2;
 			amount++;
 			length = 0;
-			(*(asmCode -> string_buffer + amount)).start_line = symbol + p + 1;
+			(*((myAsm -> asmCode).string_buffer + amount)).start_line = symbol + p + 1;
 		}
 		p++;
 	}
-	(*(asmCode -> string_buffer + amount)).len = length;                                        
+	(*((myAsm -> asmCode).string_buffer + amount)).len = length;                                        
 
     return 1;
 }
@@ -157,5 +179,34 @@ int file_close (FILE *file_text)
 	{
 		assert(0);
 	}
+	return 1;
+}
+int BufferBinCtor (Asm_t *myAsm)
+{
+	if (((myAsm -> binCode).bin_buffer = (Elem_t*) calloc ((myAsm -> asmCode).n_strings * 2, sizeof (Elem_t))) == nullptr)
+	{
+		assert(0);
+	}
+	(myAsm -> binCode).n_elements = 0;
+	return 1;
+}
+
+int BufferBinDtor (Asm_t *myAsm)
+{
+	free((myAsm -> binCode).bin_buffer);
+	return 1;
+}
+
+int AsmCtor(Asm_t *myAsm)
+{
+	BufferTextCtor (myAsm);
+	BufferBinCtor  (myAsm);
+	return 1;
+}
+
+int AsmDtor(Asm_t *myAsm)
+{
+	BufferTextDtor (myAsm);
+	BufferBinDtor  (myAsm);
 	return 1;
 }

@@ -16,13 +16,14 @@
 
 int main(void)
 { 
-    BufferAsm_t asmCode = {};
-    bufferCtor (&asmCode);
-
-    arrOfptr   (&asmCode);
-    txt_to_asm (&asmCode);
-
-    bufferDtor (&asmCode);
+    Asm_t myAsm = {};
     
+    AsmCtor    (&myAsm);
+    arrOfptr   (&myAsm);
+
+    AssemblingFirst  (&myAsm);
+    AssemblingSecond (&myAsm);
+
+    AsmDtor    (&myAsm);
     return 0;
 }

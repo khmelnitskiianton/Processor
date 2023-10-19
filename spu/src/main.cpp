@@ -19,14 +19,12 @@ int main(void)
 {
     Spu_t mySpu = {};
 
-    bufferCtor (&(mySpu));
-    StackCtor  (&(mySpu.myStack), &(mySpu.myBuffer));
+    SpuCtor     (&mySpu);
 
     process_asm (&(mySpu));
 
-    printf("\n>>>WELL DONE!!! CHECK OUTPUT.TXT!!!<<<\n");
+    SpuDtor     (&mySpu);
 
-    bufferDtor (&(mySpu));
-    StackDtor  (&(mySpu.myStack));
+    printf("\n>>>WELL DONE!!! CHECK OUTPUT.TXT!!!<<<\n");
     return 0;
 }

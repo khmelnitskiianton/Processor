@@ -35,7 +35,7 @@ enum math_codes {
     
     #include "commands.h"
 
-   #undef DEF_CMD
+    #undef DEF_CMD
 };
 
 const RegID_t REGISTERS[] = {
@@ -45,8 +45,11 @@ const RegID_t REGISTERS[] = {
     {"rdx", 4},
 };
 
-const size_t AMOUNT_OF_COMMANDS  = sizeof(COMMANDS)  / sizeof(BinCommand);
+const size_t AMOUNT_OF_LABELS    = 10;
+const size_t AMOUNT_OF_COMMANDS  = sizeof(COMMANDS)  / sizeof(BinCommand_t);
 const size_t AMOUNT_OF_REGISTERS = sizeof(REGISTERS) / sizeof(RegID_t);
+
+#define ON_SECOND_RUN(...) if ((myCMDline -> n_run) == 2) __VA_ARGS__
 
 #define FILE_TEXT  "./input_text.txt"
 #define FILE_BIN   "./input_bin.txt"
