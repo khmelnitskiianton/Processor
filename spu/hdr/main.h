@@ -56,4 +56,10 @@ const int N_ERRORS = 8;
 const int MULTIPLIER = 2;
 const int MIN_LEN = 5;
 
+enum return_of_command {
+    IF_HLT     = 0,
+    IF_LABEL   = 1,
+    IF_COMMAND = 2,
+};
+
 #endif 

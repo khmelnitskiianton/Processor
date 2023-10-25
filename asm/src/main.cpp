@@ -1,12 +1,4 @@
 #include <stdio.h>
-#include <assert.h>
-#include <string.h>
-#include <limits.h>
-#include <math.h>
-#include <ctype.h>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 
 #include "arrays.h"
 #include "type.h"
@@ -18,12 +10,15 @@ int main(void)
 { 
     Asm_t myAsm = {};
     
-    AsmCtor    (&myAsm);
-    arrOfptr   (&myAsm);
+    AsmCtor         (&myAsm);
+    arrOfptr        (&myAsm);
 
-    AssemblingFirst  (&myAsm);
-    AssemblingSecond (&myAsm);
+    Assembling      (&myAsm, 1);
+    Assembling      (&myAsm, 2);
 
-    AsmDtor    (&myAsm);
+	WriteBufToFile  (&myAsm);
+    AsmDtor         (&myAsm);
+
+    printf("\n>>>WELL DONE!!! CHECK OUTPUT.TXT!!!<<<\n");
     return 0;
 }

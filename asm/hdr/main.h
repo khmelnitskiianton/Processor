@@ -20,6 +20,7 @@ typedef struct BufferAsm {
 typedef struct Label {
     char*  label;
     int    address;
+    size_t len_label;
 } Label_t;
 
 typedef struct CMDLine {

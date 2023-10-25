@@ -16,6 +16,5 @@ int mysqrt       (Spu_t* mySpu);
 int mysin        (Spu_t* mySpu);
 int mycos        (Spu_t* mySpu);
 int clean_buffer (void);
-int compare      (double x, double y);
 
 #endif

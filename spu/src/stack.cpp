@@ -25,7 +25,7 @@ int StackCtor (Stack_t *stk, BufferSpu_t *bffr)
 
     if ((stk -> data = (Elem_t*) calloc (1, sizeof(Elem_t)*(stk -> capacity))) == nullptr)
     {   
-        fprintf(stdout,            "ERROR IN INITIALIZATION OF CALLOC");
+        fprintf(stdout,          "ERROR IN INITIALIZATION OF CALLOC");
         fprintf(stk -> file_out, "ERROR IN INITIALIZATION OF CALLOC");  
         abort();
     }
@@ -112,4 +112,12 @@ int printing_stack (Stack_t* stk, const char* file, const size_t line, const cha
     fprintf (stk -> file_out,"\t} \n"
             "}   \n");
     return 1;
+}
+
+int compare (double x, double y)
+{
+    if (((isnan (x) == 1) && (isnan (y) == 1)) || (fabs (x - y) < EPSILONE))
+        return 1;
+    else
+        return 0;
 }

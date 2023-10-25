@@ -1,12 +1,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
-#include <limits.h>
-#include <math.h>
 #include <ctype.h>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 
 #include "arrays.h"
 #include "type.h"
@@ -22,14 +17,6 @@ int get_reg_id (char* reg_str)
         if (!strcmp(reg_str, REGISTERS[i].name)) return REGISTERS[i].id;
     }
     return 0;
-}
-
-int compare (double x, double y)
-{
-    if (((isnan (x) == 1) && (isnan (y) == 1)) || (fabs (x - y) < EPSILONE))
-        return 1;
-    else
-        return 0;
 }
 
 int isReg (char* arg)
@@ -52,7 +39,7 @@ int isCMDLabel (char* arg)
 
 int isLabel (char* arg)
 {
-    if (arg[0] == ':') return 1;
+    if (strchr(arg, ':') != nullptr) return 1;
     return 0;
 }
 
@@ -81,4 +68,30 @@ int RecoverAll (Asm_t* myAsm)
     RecoverTextBuffer (myAsm);
     myAsm -> binCode.n_elements = 0;
     return 1;
+}
+
+int InitLine (CMDLine_t* myCMDline)
+{
+    myCMDline -> command   = nullptr;
+    myCMDline -> reg       = nullptr; 
+
+    myCMDline -> label     = nullptr;
+    myCMDline -> cmd_label = nullptr;
+
+    myCMDline -> value     = POISON_ELEMENT;
+
+    myCMDline -> n_run     = NULL;
+
+    return 1;
+}
+
+size_t LabelLength (CMDLine_t* myCMDline)
+{
+    char* str = myCMDline -> label;
+    size_t n_chars = 0;
+    while ((*(str + n_chars) != ':'))
+    {
+        n_chars++;
+    }
+    return n_chars;
 }

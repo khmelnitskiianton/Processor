@@ -1,9 +1,6 @@
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
-#include <limits.h>
-#include <math.h>
-#include <ctype.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>

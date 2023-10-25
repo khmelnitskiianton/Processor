@@ -1,12 +1,6 @@
 #include <stdio.h>
-#include <assert.h>
 #include <string.h>
-#include <limits.h>
-#include <math.h>
-#include <ctype.h>
 #include <stdlib.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 
 #include "arrays.h"
 #include "type.h"
@@ -15,13 +9,14 @@
 #include "buffer.h"
 #include "asm.h"
 
-int AssemblingFirst (Asm_t *myAsm)
+int Assembling(Asm_t *myAsm, int n_run)
 {
-    int n_run = 1;
+    RecoverAll (myAsm);
     for (size_t i = 0; i < (myAsm -> asmCode).n_strings; i++)
     {
         char* str = (*(((myAsm -> asmCode).string_buffer) + i)).start_line;
         CMDLine_t myCMDline = {};
+        InitLine(&myCMDline);
         myCMDline.n_run = n_run;
         if (isLabel(str))
         {
@@ -32,31 +27,6 @@ int AssemblingFirst (Asm_t *myAsm)
             ProcessCMD   (str, &myCMDline, myAsm); 
         }
     }
-    return 1;
-}
-
-int AssemblingSecond (Asm_t *myAsm)
-{
-    RecoverAll(myAsm);
-
-    int n_run = 2;
-	for (size_t i = 0; i < (myAsm -> asmCode).n_strings; i++)
-    {
-        char* str = (*(((myAsm -> asmCode).string_buffer) + i)).start_line;
-        CMDLine_t myCMDline = {};
-        myCMDline.n_run = n_run;
-        if (isLabel(str))
-        {
-            ProcessLabel (str, &myCMDline, myAsm);
-        }
-        else
-        {
-            ProcessCMD   (str, &myCMDline, myAsm); 
-        }
-    }
-
-	WriteBufToFile (myAsm);
-	
     return 1;
 }
 
@@ -71,7 +41,7 @@ int WriteCommandToBuf (CMDLine_t* myCMDline, Asm_t *myAsm)
             if ((myCMDline -> reg) != NULL) bin_command |= ARG_FORMAT_REGISTER;
 
             if (!COMPARE_TYPE((myCMDline -> value), POISON_ELEMENT)) bin_command |= ARG_FORMAT_IMMED;
-
+            
             *((myAsm -> binCode).bin_buffer + (myAsm -> binCode).n_elements) = bin_command;
             (myAsm -> binCode).n_elements++;
 
@@ -122,7 +92,7 @@ int CompleteStructWithCMD (size_t amount_args, char* arg, CMDLine_t* myCMDline)
         case 1: 
             if      (isReg(arg))      {myCMDline -> reg       = arg;}
             else if (isCMDLabel(arg)) {myCMDline -> cmd_label = arg;}
-            else if (isValue(arg))    {myCMDline -> value     = STR_TO_TYPE(arg)}
+            else if (isValue(arg))    {myCMDline -> value     = STR_TO_INT(arg)}
             else 
             {
                 //make dump print
@@ -138,7 +108,7 @@ int CompleteStructWithCMD (size_t amount_args, char* arg, CMDLine_t* myCMDline)
 
 int CompleteStructWithLabel (char* arg, CMDLine_t* myCMDline, Asm_t* myAsm)
 {
-    myCMDline -> label = arg + 1;
+    myCMDline -> label = arg;
     FillLabels (myCMDline, myAsm);
     return 1;
 }
@@ -159,6 +129,7 @@ int ProcessCMD (char* str, CMDLine_t* myCMDline, Asm_t* myAsm)
 
 int ProcessLabel (char* str, CMDLine_t* myCMDline, Asm_t* myAsm)
 {
+    ON_SECOND_RUN(return 1;)
     char* arg = str;
     CompleteStructWithLabel (arg, myCMDline, myAsm);
     return 1;
@@ -172,25 +143,37 @@ int WriteBufToFile (Asm_t *myAsm)
 
 int FillLabels (CMDLine_t* myCMDline, Asm_t* myAsm)
 {
+    int many_labels = 1;
     for (size_t i = 0; i < AMOUNT_OF_LABELS; i++)
     {
         if (myAsm -> labels[i].label == NULL)
         {
-            myAsm -> labels[i].label   = myCMDline -> label;
-            myAsm -> labels[i].address = myAsm -> binCode.n_elements;
+            many_labels = 0;
+            myAsm -> labels[i].label     = myCMDline -> label;
+            myAsm -> labels[i].address   = myAsm -> binCode.n_elements;
+            myAsm -> labels[i].len_label = LabelLength (myCMDline);                 
+            break;
         }
     }
-    return 1;
+    if   (many_labels) return 0; //TODO: check for overflow array of labels
+    else return 1;
 }
 
 int SearchingLabel (CMDLine_t* myCMDline, Asm_t *myAsm)
 {
     for (size_t i = 0; i < AMOUNT_OF_LABELS; i++)
     {
-        if (!strcmp(myAsm -> labels[i].label, myCMDline -> cmd_label))
+        if (myAsm -> labels[i].len_label == 0)
+        {
+            if (!strcmp(myAsm -> labels[i].label + 1, myCMDline -> cmd_label))
+            {
+                return myAsm -> labels[i].address;
+            }
+        }
+        else if (!strncmp(myAsm -> labels[i].label, myCMDline -> cmd_label, myAsm -> labels[i].len_label))
         {
             return myAsm -> labels[i].address; 
         }
     }
-    return -1;
+    return -1; //TODO: no matching labels
 }

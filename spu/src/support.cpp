@@ -167,9 +167,9 @@ int output_error (Stack_t *stk, const char* file, const size_t line, const char*
 
     for (ssize_t i = 0; (i < (stk -> capacity)); i++)
     {
-        if (i == stk -> size)                                    fprintf(stk -> file_out,"\t >[%lld] = " SPECIFIER "<\n", i, *((stk -> data) + i));
-        else if (!compare(*((stk -> data) + i), POISON_ELEMENT)) fprintf(stk -> file_out,"\t #[%lld] = " SPECIFIER "\n", i, *((stk -> data) + i));
-        else                                                     fprintf(stk -> file_out,"\t @[%lld] = " SPECIFIER "(POISON)\n", i, *((stk -> data) + i));
+        if (i == stk -> size)                                         fprintf(stk -> file_out,"\t >[%ld] = " SPECIFIER "<\n", i, *((stk -> data) + i));
+        else if (!COMPARE_TYPE(*((stk -> data) + i), POISON_ELEMENT)) fprintf(stk -> file_out,"\t #[%ld] = " SPECIFIER "\n", i, *((stk -> data) + i));
+        else                                                          fprintf(stk -> file_out,"\t @[%ld] = " SPECIFIER "(POISON)\n", i, *((stk -> data) + i));
     }
     
     fprintf (stk -> file_out,"\t} \n"

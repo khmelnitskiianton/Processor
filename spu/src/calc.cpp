@@ -20,11 +20,11 @@ int process_asm (Spu_t *mySpu)
     int checkOk = 1;
     while (checkOk)
     {
-        if (do_command (mySpu, (int) *(mySpu -> actual_command))) 
-        {
-            break;
-        }
-        else (mySpu -> actual_command)++;
+        int return_value = do_command (mySpu, *(mySpu -> actual_command));
+        
+        if (return_value == IF_HLT)     break;
+        if (return_value == IF_COMMAND) (mySpu -> actual_command)++;
+
     ON_PRINTING(
         printing_stack (&(mySpu -> myStack), __FILE__, __LINE__, __PRETTY_FUNCTION__);
     )
@@ -34,8 +34,8 @@ int process_asm (Spu_t *mySpu)
 
 int do_command (Spu_t* mySpu, int command)
 {
-     switch(command)
-     {
+    switch(command)
+    {
         #define DEF_CMD(name, name_full, num, bin_num, ...)             \
             case COMMANDS[name_full].bin_code: __VA_ARGS__ break; 
             
@@ -52,7 +52,7 @@ int do_command (Spu_t* mySpu, int command)
         }
         break;
     }       
-    return 0;
+    return IF_COMMAND;
 }
 
 int clean_buffer (void)
@@ -60,12 +60,4 @@ int clean_buffer (void)
     int ch = 0;                     
     while ((ch = getchar ()) != '\n') {}   
     return 1;
-} 
-
-int compare (double x, double y)
-{
-    if (((isnan (x) == 1) && (isnan (y) == 1)) || (fabs (x - y) < EPSILONE))
-        return 1;
-    else
-        return 0;
 }

@@ -21,7 +21,7 @@ int main(void)
 
     SpuCtor     (&mySpu);
 
-    process_asm (&(mySpu));
+    process_asm (&mySpu);
 
     SpuDtor     (&mySpu);
 

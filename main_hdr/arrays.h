@@ -12,7 +12,6 @@ typedef struct RegisterID
 {
     const char* name;
     const int id;
-
 } RegID_t;
 
 enum arg_formats {
