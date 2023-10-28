@@ -1,23 +1,33 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <ctype.h>
+#include <math.h>
 
 #include "arrays.h"
 #include "type.h"
-#include "main.h"
+#include "main_asm.h"
 #include "support.h"
 #include "buffer.h"
 #include "asm.h"
 
 int Assembling(Asm_t *myAsm, int n_run)
 {
-    RecoverAll (myAsm);
+    myAsm -> binCode.n_elements = 0;
     for (size_t i = 0; i < (myAsm -> asmCode).n_strings; i++)
     {
         char* str = (*(((myAsm -> asmCode).string_buffer) + i)).start_line;
+
+    ON_FIRST_RUN(
+        CleaningComments (str, SYMBOL_OF_COMMENT);
+    )
+
+        if ((*str == '\0')||(SkipSpaces(str))) {continue;}
+        
         CMDLine_t myCMDline = {};
         InitLine(&myCMDline);
         myCMDline.n_run = n_run;
+
         if (isLabel(str))
         {
             ProcessLabel (str, &myCMDline, myAsm);
@@ -27,6 +37,11 @@ int Assembling(Asm_t *myAsm, int n_run)
             ProcessCMD   (str, &myCMDline, myAsm); 
         }
     }
+
+    ON_LISTING(
+        fprintf(myAsm -> file_listing, DIVIDER);
+    )
+
     return 1;
 }
 
@@ -34,27 +49,38 @@ int WriteCommandToBuf (CMDLine_t* myCMDline, Asm_t *myAsm)
 {
     for (size_t i = 0; i < AMOUNT_OF_COMMANDS; i++)
     {
-        if (!strcmp (myCMDline -> command, COMMANDS[i].command))
+        if (!strncmp (myCMDline -> command, COMMANDS[i].command, myCMDline -> length_cmd))
         {
             int bin_command = (int) COMMANDS[i].bin_code & ARG_FORMAT_COMMAND;
-            
-            if ((myCMDline -> reg) != NULL) bin_command |= ARG_FORMAT_REGISTER;
+            if ((myCMDline -> reg) != 0)                bin_command |= ARG_FORMAT_REGISTER;
+            if ((myCMDline -> value) != POISON_ELEMENT) bin_command |= ARG_FORMAT_IMMED;
+            if ((myCMDline -> brackets) != 0)           bin_command |= ARG_FORMAT_MEMORY;
 
-            if (!COMPARE_TYPE((myCMDline -> value), POISON_ELEMENT)) bin_command |= ARG_FORMAT_IMMED;
-            
+        ON_LISTING(
+            int no_arg = PrintAsmListing (myCMDline, myAsm, bin_command);
+        )    
+
             *((myAsm -> binCode).bin_buffer + (myAsm -> binCode).n_elements) = bin_command;
             (myAsm -> binCode).n_elements++;
 
-            if ((myCMDline -> reg) != NULL) 
+            if ((myCMDline -> reg) != 0) 
             {
                 int reg_id = get_reg_id (myCMDline -> reg);
                 *((myAsm -> binCode).bin_buffer + (myAsm -> binCode).n_elements) = reg_id;
+            ON_LISTING(
+                no_arg = 0;    
+                fprintf(myAsm -> file_listing, "\t|REG: %d|", reg_id);
+            )
                 ((myAsm -> binCode).n_elements)++;
             }
 
-            if (!COMPARE_TYPE((myCMDline -> value), POISON_ELEMENT))
+            if ((myCMDline -> value) != POISON_ELEMENT)
             {
                 *((myAsm -> binCode).bin_buffer + (myAsm -> binCode).n_elements) = myCMDline -> value;
+            ON_LISTING(    
+                no_arg = 0;
+                fprintf(myAsm -> file_listing, "\t|VALUE: %d|", myCMDline -> value);
+            )
                 ((myAsm -> binCode).n_elements)++;
             }
 
@@ -66,41 +92,55 @@ int WriteCommandToBuf (CMDLine_t* myCMDline, Asm_t *myAsm)
                 *((myAsm -> binCode).bin_buffer + (myAsm -> binCode).n_elements) = SearchingLabel (myCMDline, myAsm);
             )
 
+            ON_LISTING(    
+                no_arg = 0;
+                fprintf(myAsm -> file_listing, "\t|LABEL: %d|", *((myAsm -> binCode).bin_buffer + (myAsm -> binCode).n_elements));
+            )
                 ((myAsm -> binCode).n_elements)++;
             }
-
+            ON_LISTING(
+                if (no_arg) {fprintf(myAsm -> file_listing,"\t\t|NO ARGS|");}
+                fprintf(myAsm -> file_listing,"\n");
+            )
             return 1;
         }
     }
     return 0;
 }
 
-int CompleteStructWithCMD (size_t amount_args, char* arg, CMDLine_t* myCMDline)
+int CompleteStructWithCMD (Parsing_t myActualWord, CMDLine_t* myCMDline)
 {
-    switch (amount_args)
+    switch (myActualWord.n_word)
     {
         case 0:
-            if (isCommand(arg)) 
+            if (isCommand(myActualWord.start_word)) 
             {
-                myCMDline -> command = arg;
+                myCMDline -> command    = myActualWord.start_word;
+                myCMDline -> length_cmd = myActualWord.length_word;
             }
             else
             {
-                //make dump print
+                //TODO: dump print
             }
         break;
-        case 1: 
-            if      (isReg(arg))      {myCMDline -> reg       = arg;}
-            else if (isCMDLabel(arg)) {myCMDline -> cmd_label = arg;}
-            else if (isValue(arg))    {myCMDline -> value     = STR_TO_INT(arg)}
-            else 
+        case 1:
+            int scan_done = 0; 
+            if (strchr(myActualWord.start_word, '[') != nullptr)
             {
-                //make dump print
+                if (strchr(myActualWord.start_word, ']') == nullptr) 
+                {
+                    printf("\n>>>>>NO CLOSE BRACKET!!!<<<<<\n");
+                }
+                scan_done = ScanWithBrackets    (myActualWord, myCMDline);
             }
-        break;
-
-        default:
-                //make dump print
+            else
+            {
+                scan_done = ScanWithoutBrackets (myActualWord, myCMDline);
+            }
+            if (!scan_done)
+            {
+                myCMDline -> cmd_label = myActualWord.start_word;
+            }
         break;
     }
     return 0;
@@ -114,14 +154,22 @@ int CompleteStructWithLabel (char* arg, CMDLine_t* myCMDline, Asm_t* myAsm)
 }
 
 int ProcessCMD (char* str, CMDLine_t* myCMDline, Asm_t* myAsm)
-{
-    size_t amount_args = 0;
-    char* arg = strtok(str, " ");
-    while (arg) 
+{    
+    Parsing_t myActualWord = {};
+    myActualWord.start_word  = str;
+    myActualWord.length_word = ParsingString (&myActualWord, ' ');
+    int run = 1;
+    while (run) 
     {
-        CompleteStructWithCMD (amount_args, arg, myCMDline);
-        arg = strtok(NULL, " ");
-        amount_args++;
+        CompleteStructWithCMD (myActualWord, myCMDline);
+        if ((myActualWord.end_of_str == 1)||(myActualWord.n_word > 2))
+        {
+            break;
+        }
+        
+        myActualWord.start_word = myActualWord.start_word + myActualWord.length_word + 1;
+        myActualWord.length_word = ParsingString (&myActualWord, ' ');
+        myActualWord.n_word++;
     }
     WriteCommandToBuf (myCMDline, myAsm);
     return 1;
@@ -137,7 +185,7 @@ int ProcessLabel (char* str, CMDLine_t* myCMDline, Asm_t* myAsm)
 
 int WriteBufToFile (Asm_t *myAsm)
 {
-    fwrite((myAsm -> binCode).bin_buffer, sizeof(Elem_t), (myAsm -> binCode).n_elements , (myAsm -> asmCode).file_out);
+    fwrite((myAsm -> binCode).bin_buffer, sizeof(Elem_t), (size_t)(myAsm -> binCode).n_elements , (myAsm -> asmCode).file_out);
     return 1;
 }
 
@@ -155,7 +203,7 @@ int FillLabels (CMDLine_t* myCMDline, Asm_t* myAsm)
             break;
         }
     }
-    if   (many_labels) return 0; //TODO: check for overflow array of labels
+    if (many_labels) return 0; //TODO: check for overflow array of labels
     else return 1;
 }
 
@@ -163,17 +211,37 @@ int SearchingLabel (CMDLine_t* myCMDline, Asm_t *myAsm)
 {
     for (size_t i = 0; i < AMOUNT_OF_LABELS; i++)
     {
-        if (myAsm -> labels[i].len_label == 0)
-        {
-            if (!strcmp(myAsm -> labels[i].label + 1, myCMDline -> cmd_label))
-            {
-                return myAsm -> labels[i].address;
-            }
-        }
-        else if (!strncmp(myAsm -> labels[i].label, myCMDline -> cmd_label, myAsm -> labels[i].len_label))
+        if (!strncmp(myAsm -> labels[i].label, myCMDline -> cmd_label, myAsm -> labels[i].len_label))
         {
             return myAsm -> labels[i].address; 
         }
     }
     return -1; //TODO: no matching labels
+}
+
+int ScanWithoutBrackets (Parsing_t myActualWord, CMDLine_t* myCMDline)
+{
+    double double_number = NAN;
+    myCMDline -> brackets = 0;
+    if (sscanf(myActualWord.start_word, " r%cx + %lf ",   &(myCMDline -> reg), &(double_number)) != 0) 
+    {
+        if (!isnan(double_number)) myCMDline -> value = (int) (double_number * N_DIGIT);
+        return 1;
+    }
+    if (sscanf(myActualWord.start_word, " r%cx ",        &(myCMDline -> reg))   != 0)  {return 1;}
+    if (sscanf(myActualWord.start_word, " %lf ",        &(double_number))   != 0) 
+    {
+        myCMDline -> value = (int) (double_number * N_DIGIT);
+        return 1;
+    }
+    return 0;
+}
+
+int ScanWithBrackets (Parsing_t myActualWord, CMDLine_t* myCMDline)
+{   
+    myCMDline -> brackets = HAVE_BRACKETS;
+    if (sscanf(myActualWord.start_word, " [r%[a-d]x + %d] ",  &(myCMDline -> reg), &(myCMDline -> value)) != 0)   {return 1;}
+    if (sscanf(myActualWord.start_word, " [r%[a-d]x] ",       &(myCMDline -> reg))   != 0)                        {return 1;}    
+    if (sscanf(myActualWord.start_word, " [%d] ",             &(myCMDline -> value))   != 0)                      {return 1;}
+    return 0;
 }

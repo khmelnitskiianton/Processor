@@ -4,27 +4,28 @@
 #include <limits.h>
 #include <math.h>
 #include <stdlib.h>
+#include <stddef.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 
 #include "arrays.h"
 #include "type.h"
-#include "main.h"
-#include "calc.h"
+#include "stack_main.h"
+#include "main_cpu.h"
 #include "buffer.h"
-#include "stack.h"
 #include "support.h"
+#include "calc.h"
 
 int main(void)
 {
-    Spu_t mySpu = {};
+    Cpu_t myCpu = {};
 
-    SpuCtor     (&mySpu);
+    CpuCtor     (&myCpu);
 
-    process_asm (&mySpu);
+    process_asm (&myCpu);
 
-    SpuDtor     (&mySpu);
+    CpuDtor     (&myCpu);
 
-    printf("\n>>>WELL DONE!!! CHECK OUTPUT.TXT!!!<<<\n");
+    printf("\n>>>CPU WELL DONE!!! CHECK LOG.TXT!!!<<<\n\n");
     return 0;
 }

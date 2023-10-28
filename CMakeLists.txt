@@ -7,5 +7,5 @@ set(CMAKE_CXX_FLAGS "-D _DEBUG -ggdb3 -std=c++17 -O0 -Wall -Wextra -Weffc++ -Wag
 include_directories(./main_hdr) 
 
 add_subdirectory(asm)
-add_subdirectory(spu)
+add_subdirectory(cpu)
 add_subdirectory(disasm)

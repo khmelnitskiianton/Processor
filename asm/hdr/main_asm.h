@@ -1,5 +1,5 @@
-#ifndef HEAD_ASM_H
-#define HEAD_ASM_H
+#ifndef MAIN_ASM_H
+#define MAIN_ASM_H
 
 typedef struct Line {
     size_t len;
@@ -25,25 +25,35 @@ typedef struct Label {
 
 typedef struct CMDLine {
     char*  command;
-    char*  reg;
+    size_t length_cmd;
+
+    char   reg;
 
     char*  label;
     char*  cmd_label;
 
     Elem_t value;
-
     int    n_run;
+    int    brackets;
 } CMDLine_t;
 
 typedef struct BufferBin {
     Elem_t* bin_buffer;
-    size_t  n_elements;
+    int  n_elements;
 } BufferBin_t;
 
 typedef struct Asm {
     BufferAsm_t asmCode;
     BufferBin_t binCode;
     Label_t     labels[AMOUNT_OF_LABELS];
+    FILE*       file_listing;
 } Asm_t;
+
+typedef struct Parsing {
+    char*   start_word;
+    size_t  length_word;
+    int     n_word;
+    int     end_of_str;
+} Parsing_t;
 
 #endif 

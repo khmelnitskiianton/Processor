@@ -1,0 +1,91 @@
+push 0
+pop rax
+push 0
+pop rbx
+push 40
+pop rdx
+
+;rax = x | rbx = y | rcx = element | rdx = width
+
+for_y:
+for_x:
+
+push rbx
+push rdx
+mul
+push rax
+add
+pop rcx         ;Вычислили элемент опретивки
+
+push rax
+push rdx
+push 2
+div
+sub
+push rax
+push rdx
+push 2
+div
+sub
+mul             ;Вычислили (x-9)^2
+push 1.6
+mul
+
+push rbx
+push rdx
+push 2
+div
+sub
+push rbx
+push rdx
+push 2
+div
+sub
+mul             ;Вычислили (y-9)^2
+
+add
+push rdx
+push 2
+div
+push 1.5
+sub
+push rdx
+push 2
+div
+push 1.5
+sub
+mul 
+jae change      ;Сравниваем
+push 0          ;Если вне окружности то 0
+pop [rcx]
+back:
+
+push 1
+push rax
+add
+pop rax         ;x++
+
+push rdx
+push rax        ;x < 30
+jb for_x        
+push 0
+pop rax
+
+push 1
+push rbx
+add
+pop rbx         ;y++
+
+push rdx
+push rbx        ;y < 30
+jb for_y        ;for (y)
+push 0
+pop rbx
+
+draw
+hlt
+
+change:         ;если вне окружности
+push 1
+pop [rcx]
+jmp back

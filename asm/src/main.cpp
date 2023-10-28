@@ -2,7 +2,7 @@
 
 #include "arrays.h"
 #include "type.h"
-#include "main.h"
+#include "main_asm.h"
 #include "buffer.h"
 #include "asm.h"
 
@@ -19,6 +19,6 @@ int main(void)
 	WriteBufToFile  (&myAsm);
     AsmDtor         (&myAsm);
 
-    printf("\n>>>WELL DONE!!! CHECK OUTPUT.TXT!!!<<<\n");
+    printf("\n>>>ASM WELL DONE!!! CHECK LISTING.TXT AND INPUT_BIN.TXT!!!<<<\n");
     return 0;
 }

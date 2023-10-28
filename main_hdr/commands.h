@@ -1,47 +1,62 @@
-DEF_CMD(push, PUSH_NUM, 0, 0b001'00001, 
+DEF_CMD(push, 0, 0b000'00001, 
 {
-    Elem_t value = *(++(mySpu -> actual_command));
-    if (!COMPARE_TYPE(value, POISON_ELEMENT)) push (&(mySpu -> myStack), value);
-    else printf("\n\n>>>WARNING<<<\nVALUE == NULL!!!\n\n");
+    ArgCMD_t myArgCMD = {};
+
+    myArgCMD.value = POISON_ELEMENT; 
+
+    GetArg (myCpu, command, &myArgCMD);
+
+    if (command & ARG_FORMAT_MEMORY) 
+    {
+        push (&(myCpu -> myStack), myCpu -> myMemory[myArgCMD.result]);
+    }
+    else
+    {
+        push (&(myCpu -> myStack), myArgCMD.result);
+    }
+ON_LISTING_MEMORY(
+    PrintMemoryListing(myCpu);
+)
 }
 )
 
-DEF_CMD(push, PUSH_REG, 1, 0b010'00001, 
+DEF_CMD(pop, 1, 0b000'00010,
 {
-    int n_reg = (int) *(++(mySpu -> actual_command));
-    if (n_reg != NULL) 
+    ArgCMD_t myArgCMD = {};
+
+    myArgCMD.value = POISON_ELEMENT; 
+
+    GetArg (myCpu, command, &myArgCMD);
+
+    if (command & ARG_FORMAT_MEMORY) 
     {
-        switch (n_reg)
+        pop (&(myCpu -> myStack), &(myCpu -> myMemory[myArgCMD.result]));
+    }
+    else
+    {
+        if (command & ARG_FORMAT_IMMED) 
         {
-            case 1:         push(&(mySpu -> myStack), mySpu -> rax);            break; 
-            case 2:         push(&(mySpu -> myStack), mySpu -> rbx);            break;
-            case 3:         push(&(mySpu -> myStack), mySpu -> rcx);            break;
-            case 4:         push(&(mySpu -> myStack), mySpu -> rdx);            break;
+            printf("\n>>>>>POP WITH NUMBER!!! WTF???<<<<<\n"); //TODO: dump
+        }
+        else  
+        {
+            switch (myArgCMD.reg)
+            {
+                case 1:         pop(&(myCpu -> myStack), &(myCpu -> rax));          break;
+                case 2:         pop(&(myCpu -> myStack), &(myCpu -> rbx));          break;
+                case 3:         pop(&(myCpu -> myStack), &(myCpu -> rcx));          break;
+                case 4:         pop(&(myCpu -> myStack), &(myCpu -> rdx));          break;
+                default:        printf(">>>>>UNKNOWN REGISTER<<<<<");                break;
+            }       
         }
     }
-    else printf("\n\n>>>WARNING<<<\nREG NUMBER == NULL!!!\n\n");
+ON_LISTING_MEMORY(
+    PrintMemoryListing(myCpu);
+)
 }
 )
 
-DEF_CMD(pop,  POP_REG , 2, 0b010'00010,
-{
-    int n_reg = (int) *(++(mySpu -> actual_command));
-    if (n_reg != NULL) 
-    {
-        switch (n_reg)
-        {
-            case 1:         pop(&(mySpu -> myStack), &(mySpu -> rax));          break;
-            case 2:         pop(&(mySpu -> myStack), &(mySpu -> rbx));          break;
-            case 3:         pop(&(mySpu -> myStack), &(mySpu -> rcx));          break;
-            case 4:         pop(&(mySpu -> myStack), &(mySpu -> rdx));          break;
-            default:        printf(">>>>>UNKNOWN REGISTER<<<<<")                break;
-        }
-    }
-    else printf("\n\n>>>WARNING<<<\nREG NUMBER == NULL!!!\n\n");
-}
-)
-
-DEF_CMD(in,   IN,       3, 0b000'00011, 
+DEF_CMD(in, 2, 0b000'00011, 
 {
     double num = POISON_ELEMENT;
     printf("Enter value please to put in stack: ");
@@ -50,203 +65,283 @@ DEF_CMD(in,   IN,       3, 0b000'00011,
         clean_buffer ();
         printf ("\nWtf? Its not normal double number. Maybe it is infinite/NAN number or letters. Another attempt you piece of shit, hey you, MAAAAN!\n");
     }
-    push (&(mySpu -> myStack), (int) (num * N_DIGIT));
+    push (&(myCpu -> myStack), (int) (num * N_DIGIT));
 }
 )
 
-DEF_CMD(div,  DIV,      4, 0b000'00100, 
+DEF_CMD(div, 3, 0b000'00100, 
 {
     Elem_t x = POISON_ELEMENT;
     Elem_t y = POISON_ELEMENT;
-    pop(&(mySpu -> myStack), &y);
-    pop(&(mySpu -> myStack), &x);
-    push(&(mySpu -> myStack), (x * N_DIGIT) / y);
+    pop(&(myCpu -> myStack), &y);
+    pop(&(myCpu -> myStack), &x);
+    push(&(myCpu -> myStack), (x * N_DIGIT) / y);
+ON_LISTING_MEMORY(
+    PrintMemoryListing(myCpu);
+)
 }
 )
 
-DEF_CMD(add,  ADD,      5, 0b000'00101, 
+DEF_CMD(add, 4, 0b000'00101, 
 {
     Elem_t x = POISON_ELEMENT;
     Elem_t y = POISON_ELEMENT;
-    pop(&(mySpu -> myStack), &y);
-    pop(&(mySpu -> myStack), &x);
-    push(&(mySpu -> myStack), x + y);
+    pop(&(myCpu -> myStack), &y);
+    pop(&(myCpu -> myStack), &x);
+    push(&(myCpu -> myStack), x + y);
+ON_LISTING_MEMORY(
+    PrintMemoryListing(myCpu);
+)
 }
 )
 
-DEF_CMD(mul,  MUL,      6, 0b000'00110,
+DEF_CMD(mul, 5, 0b000'00110,
 {
     Elem_t x = POISON_ELEMENT;
     Elem_t y = POISON_ELEMENT;
-    pop(&(mySpu -> myStack), &y);
-    pop(&(mySpu -> myStack), &x);
-    push(&(mySpu -> myStack), x * y / N_DIGIT);
+    pop(&(myCpu -> myStack), &y);
+    pop(&(myCpu -> myStack), &x);
+    push(&(myCpu -> myStack), x * y / N_DIGIT);
+ON_LISTING_MEMORY(
+    PrintMemoryListing(myCpu);
+)
 }
 )
 
-DEF_CMD(sqrt, SQRT,     7, 0b000'00111, 
+DEF_CMD(sqrt, 6, 0b000'00111, 
 {
     Elem_t x = POISON_ELEMENT;
-    pop(&(mySpu -> myStack), &x);
+    pop(&(myCpu -> myStack), &x);
     double z =  sqrt(((double) x) / N_DIGIT);
-    if (x >= 0) push(&(mySpu -> myStack), (int) (z * N_DIGIT));
+    if (x >= 0) push(&(myCpu -> myStack), (int) (z * N_DIGIT));
+    else printf(">>>>>SQRT(X) < 0 !!!<<<<<");
+
+ON_LISTING_MEMORY(
+    PrintMemoryListing(myCpu);
+)
 }
 )
 
-DEF_CMD(sub,  SUB,      8, 0b000'01000, 
+DEF_CMD(sub, 7, 0b000'01000, 
 {
     Elem_t x = POISON_ELEMENT;
     Elem_t y = POISON_ELEMENT;
-    pop(&(mySpu -> myStack), &y);
-    pop(&(mySpu -> myStack), &x);
-    push(&(mySpu -> myStack), x - y);
+    pop(&(myCpu -> myStack), &y);
+    pop(&(myCpu -> myStack), &x);
+    push(&(myCpu -> myStack), x - y);
+
+ON_LISTING_MEMORY(
+    PrintMemoryListing(myCpu);
+)
 }
 )
 
-DEF_CMD(cos,  COS,      9, 0b000'01001, 
+DEF_CMD(cos, 8, 0b000'01001, 
 {
     Elem_t x = POISON_ELEMENT;
-    pop(&(mySpu -> myStack), &x);
+    pop(&(myCpu -> myStack), &x);
     double z =  cos(((double) x) / N_DIGIT);
-    push(&(mySpu -> myStack), (int) (z * N_DIGIT));
+    push(&(myCpu -> myStack), (int) (z * N_DIGIT));
+
+ON_LISTING_MEMORY(
+    PrintMemoryListing(myCpu);
+)
 }
 )
 
-DEF_CMD(sin,  SIN,     10, 0b000'01010, 
+DEF_CMD(sin, 9, 0b000'01010, 
 {
     Elem_t x = POISON_ELEMENT;
-    pop(&(mySpu -> myStack), &x);
+    pop(&(myCpu -> myStack), &x);
     double z =  sin(((double) x) / N_DIGIT);
-    push(&(mySpu -> myStack), (int) (z * N_DIGIT));
+    push(&(myCpu -> myStack), (int) (z * N_DIGIT));
+
+ON_LISTING_MEMORY(
+    PrintMemoryListing(myCpu);
+)
 }
 )
 
-DEF_CMD(out,  OUT,     11, 0b000'01011, 
+DEF_CMD(out, 10, 0b000'01011, 
 {
     Elem_t result = POISON_ELEMENT;
-    pop (&(mySpu -> myStack), &result);
+    pop (&(myCpu -> myStack), &result);
+ 
+    fprintf (stdout, "%lf\n", ((double) result) / N_DIGIT);
 
-    if ((mySpu -> myStack.size) > 0) printf("\n\n>>>WARNING<<<\nYour Stack is not empty now!!!\n\n"); 
-    fprintf (mySpu -> myBuffer.file_out, "%lf", ((double) result) / N_DIGIT);
+ON_LISTING_MEMORY(
+    PrintMemoryListing(myCpu);
+)
 }
 )
 
-DEF_CMD(jmp, JMP,      12, 0b000'01100,
+DEF_CMD(jmp, 11, 0b000'01100,
 {
-    (mySpu -> actual_command)++;
-    Elem_t jump = *((mySpu -> actual_command));
-    (mySpu -> actual_command) = (mySpu -> myBuffer.text_buffer + jump);
+    (myCpu -> actual_command)++;
+    Elem_t jump = *((myCpu -> actual_command));
+    (myCpu -> actual_command) = (myCpu -> myBuffer.text_buffer + jump);
     return IF_LABEL;
 }
 )
 
-DEF_CMD(ja,  JA,       13, 0b000'01101,
+DEF_CMD(ja, 12, 0b000'01101,
 {
     Elem_t last     = POISON_ELEMENT;
     Elem_t sec_last = POISON_ELEMENT;
     
-    pop(&(mySpu -> myStack), &last);
-    pop(&(mySpu -> myStack), &sec_last);
+    pop(&(myCpu -> myStack), &last);
+    pop(&(myCpu -> myStack), &sec_last);
 
+    (myCpu -> actual_command)++;
     if (last > sec_last)
     {
-        (mySpu -> actual_command)++;
-        Elem_t jump = *((mySpu -> actual_command));
-        (mySpu -> actual_command) = (mySpu -> myBuffer.text_buffer + jump);
+        Elem_t jump = *((myCpu -> actual_command));
+        (myCpu -> actual_command) = (myCpu -> myBuffer.text_buffer + jump);
     }
+    else (myCpu -> actual_command)++;
     return IF_LABEL;
 
 }
 )
 
-DEF_CMD(jae,  JAE,       14, 0b000'01110,
+DEF_CMD(jae, 13, 0b000'01110,
 {
     Elem_t last     = POISON_ELEMENT;
     Elem_t sec_last = POISON_ELEMENT;
     
-    pop(&(mySpu -> myStack), &last);
-    pop(&(mySpu -> myStack), &sec_last);
+    pop(&(myCpu -> myStack), &last);
+    pop(&(myCpu -> myStack), &sec_last);
     
+    (myCpu -> actual_command)++;
     if (last >= sec_last)
     {
-        (mySpu -> actual_command)++;
-        Elem_t jump = *((mySpu -> actual_command));
-        (mySpu -> actual_command) = (mySpu -> myBuffer.text_buffer + jump);
+        Elem_t jump = *((myCpu -> actual_command));
+        (myCpu -> actual_command) = (myCpu -> myBuffer.text_buffer + jump);
     }
+    else (myCpu -> actual_command)++;
     return IF_LABEL;
 }
 )
 
-DEF_CMD(jb,  JB,       15, 0b000'01111,
+DEF_CMD(jb, 14, 0b000'01111,
 {
     Elem_t last     = POISON_ELEMENT;
     Elem_t sec_last = POISON_ELEMENT;
     
-    pop(&(mySpu -> myStack), &last);
-    pop(&(mySpu -> myStack), &sec_last);
+    pop(&(myCpu -> myStack), &last);
+    pop(&(myCpu -> myStack), &sec_last);
     
+    (myCpu -> actual_command)++;
     if (last < sec_last)
     {
-        (mySpu -> actual_command)++;
-        Elem_t jump = *((mySpu -> actual_command));
-        (mySpu -> actual_command) = (mySpu -> myBuffer.text_buffer + jump);
+        Elem_t jump = *((myCpu -> actual_command));
+        (myCpu -> actual_command) = (myCpu -> myBuffer.text_buffer + jump);
     }
+    else (myCpu -> actual_command)++;
     return IF_LABEL;
 }
 )
 
-DEF_CMD(jbe,  JBE,       16, 0b000'10000,
+DEF_CMD(jbe, 15, 0b000'10000,
 {
     Elem_t last     = POISON_ELEMENT;
     Elem_t sec_last = POISON_ELEMENT;
     
-    pop(&(mySpu -> myStack), &last);
-    pop(&(mySpu -> myStack), &sec_last);
+    pop(&(myCpu -> myStack), &last);
+    pop(&(myCpu -> myStack), &sec_last);
     
+    (myCpu -> actual_command)++;
     if (last <= sec_last)
     {
-        (mySpu -> actual_command)++;
-        Elem_t jump = *((mySpu -> actual_command));
-        (mySpu -> actual_command) = (mySpu -> myBuffer.text_buffer + jump);
+        Elem_t jump = *((myCpu -> actual_command));
+        (myCpu -> actual_command) = (myCpu -> myBuffer.text_buffer + jump);
     }
+    else (myCpu -> actual_command)++;
     return IF_LABEL;
 }
 )
 
-DEF_CMD(je,  JE,       17, 0b000'10001,
+DEF_CMD(je, 16, 0b000'10001,
 {
     Elem_t last     = POISON_ELEMENT;
     Elem_t sec_last = POISON_ELEMENT;
     
-    pop(&(mySpu -> myStack), &last);
-    pop(&(mySpu -> myStack), &sec_last);
-
+    pop(&(myCpu -> myStack), &last);
+    pop(&(myCpu -> myStack), &sec_last);
+    (myCpu -> actual_command)++;
     if (last == sec_last)
     {
-        (mySpu -> actual_command)++;
-        Elem_t jump = *((mySpu -> actual_command));
-        (mySpu -> actual_command) = (mySpu -> myBuffer.text_buffer + jump);
+        Elem_t jump = *((myCpu -> actual_command));
+        (myCpu -> actual_command) = (myCpu -> myBuffer.text_buffer + jump);
     }
+    else (myCpu -> actual_command)++;
     return IF_LABEL;
 }
 )
 
-DEF_CMD(jne,  JNE,       18, 0b000'10011,
+DEF_CMD(jne, 17, 0b000'10011,
 {
     Elem_t last     = POISON_ELEMENT;
     Elem_t sec_last = POISON_ELEMENT;
     
-    pop(&(mySpu -> myStack), &last);
-    pop(&(mySpu -> myStack), &sec_last);
+    pop(&(myCpu -> myStack), &last);
+    pop(&(myCpu -> myStack), &sec_last);
 
+    (myCpu -> actual_command)++;
     if (last != sec_last)
     {
-        (mySpu -> actual_command)++;
-        Elem_t jump = *((mySpu -> actual_command));
-        (mySpu -> actual_command) = (mySpu -> myBuffer.text_buffer + jump);
+        Elem_t jump = *((myCpu -> actual_command));
+        (myCpu -> actual_command) = (myCpu -> myBuffer.text_buffer + jump);
     }
+    else (myCpu -> actual_command)++;
     return IF_LABEL;
 }
 )
 
-DEF_CMD(hlt,  HLT,     19, 0b000'11111, {return IF_HLT;})
+DEF_CMD(call, 18, 0b000'10100,
+{
+    (myCpu -> actual_command)++;
+
+    push(&(myCpu -> myStackReturns), ((myCpu -> actual_command) - (myCpu -> myBuffer.text_buffer)));
+
+    Elem_t jump = *((myCpu -> actual_command));
+    (myCpu -> actual_command) = (myCpu -> myBuffer.text_buffer + jump);
+    return IF_LABEL;
+}
+)
+
+DEF_CMD(ret, 19, 0b000'10101,
+{
+    int shift = 0;
+    pop(&(myCpu -> myStackReturns), &shift);
+    myCpu -> actual_command = myCpu -> myBuffer.text_buffer + shift;
+}
+)
+
+DEF_CMD(outc, 20, 0b000'10110,
+{
+    Elem_t result = POISON_ELEMENT;
+    pop (&(myCpu -> myStack), &result);
+    fprintf (stdout, "%c", result / N_DIGIT);
+
+ON_LISTING_MEMORY(
+    PrintMemoryListing(myCpu);
+)   
+}
+)
+
+DEF_CMD(draw, 21, 0b000'10111,
+{
+    for (size_t i = 0; i < LENG_OF_WINDOW; i++)
+    {
+        for (size_t j = 0; j < LENG_OF_WINDOW; j++)
+        {
+            if ((i * LENG_OF_WINDOW + j) % LENG_OF_WINDOW == 0) fprintf(stdout, "\n");
+            if (myCpu -> myMemory[i * LENG_OF_WINDOW + j] == 0) fprintf (stdout, " . ");
+            if (myCpu -> myMemory[i * LENG_OF_WINDOW + j] == 1*N_DIGIT) fprintf (stdout, " 0 ");
+        }
+    }
+}
+)
+
+DEF_CMD(hlt, 22, 0b000'11111, {return IF_HLT;})
