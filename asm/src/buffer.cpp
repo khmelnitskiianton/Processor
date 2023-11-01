@@ -130,7 +130,7 @@ size_t text_size (FILE *file_text)
 	struct stat st = {};
     int fd = fileno (file_text); 
     fstat (fd, &st);
-    size_t size_text = st.st_size;
+    size_t size_text = (size_t) st.st_size;
 	return size_text;
 }
 

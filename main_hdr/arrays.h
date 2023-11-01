@@ -1,7 +1,7 @@
 #ifndef ARRAYS_H
 #define ARRAYS_H
 
-#define LISTING_ASM 1
+#define LISTING_ASM 0
 
 #if LISTING_ASM
 #define ON_LISTING(...) __VA_ARGS__
@@ -53,8 +53,12 @@ const RegID_t REGISTERS[] = {
     {"rdx", 4},
 };
 
-#define MEMORY_LENGTH 1600
-#define LENG_OF_WINDOW 40
+const int MEMORY_LENGTH    = 3000;
+const int WIDTH_OF_WINDOW  = 30;
+const int LENGTH_OF_WINDOW = 100;
+const int SIZE_OF_SQUARE   = 20;
+const int WIDTH_OF_SCREEN  = WIDTH_OF_WINDOW * SIZE_OF_SQUARE;
+const int LENGTH_OF_SCREEN  = LENGTH_OF_WINDOW * SIZE_OF_SQUARE;
 
 const size_t AMOUNT_OF_LABELS    = 30;
 const size_t AMOUNT_OF_COMMANDS  = sizeof(COMMANDS)  / sizeof(BinCommand_t);

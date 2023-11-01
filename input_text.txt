@@ -1,160 +1,45 @@
 in
-in
-in
+pop rax
+push rax
 pop rcx
-pop rbx
-pop rax                     ;вводим все в регистры
 
-call check_a_null           ;пошла проверка на не квадратное ур-ие
+call check_n_null   ;случай если n = 0(а там будет 0! = 1)
 
-call D                      ;если не ноль то начинаем вычислять D
-
-push 0
-push rdx
-jb no_roots                 ;если D < 0 то нет корней
-
-push 0
-push rdx
-je one_root                 ;Если D = 0 то один корень
-
-push 0
-push rdx
-ja two_roots                ;Если D > 0 то два корня
-
-hlt
-
-two_roots:
-call x1
-call x2
-push 10
-push 50
-push 61
-push 78
-outc
-outc
-outc
-outc
-out
+call factorial      ;начинаем рекурсию
+end:
+push rcx            ;взяли итог
 out
 hlt
 
-no_roots:
-push 10
-push 48
-push 61
-push 78
-outc
-outc
-outc
-outc
-hlt
-
-one_root:
-call x1
-push 10
-push 49
-push 61
-push 78
-outc
-outc
-outc
-outc
-out
-hlt
-
-x1:
+factorial:
+push rax
+push 1
+sub
 push 0
-push rbx
-sub
-push rdx
-sqrt
-add
-push 2
-push rax
-mul
-div
-ret
+je end              ;выходим если да, в rax лежит факториал
 
-x2:
-push 0
-push rbx
+push rax            ;если все ок то производим умножение записываем результат в rcx
+push 1
 sub
-push rdx
-sqrt
-sub
-push 2
-push rax
-mul
-div
-ret
-
-D:
-push rbx
-push rbx
-mul
-push 4
-push rax
 push rcx
 mul
-mul
+pop rcx
+
+push rax            ;уменьшаем n на 1
+push 1
 sub
-pop rdx
+pop rax
+
+call factorial      ;рекурсия!!!
 ret
 
-check_a_null:
-push 0
+check_n_null:       ;проверка на 0
 push rax
-jne a_not_null
-call check_b_null
-a_not_null:
+push 0
+je n_is_null
 ret
 
-check_b_null:
-push 0
-push rbx
-jne b_not_null
-call check_c_null
-
-b_not_null:
-push 0
-push rcx
-sub
-push rbx
-div
-push 10
-push 49
-push 61
-push 78
-outc
-outc
-outc
-outc
+n_is_null:          ;если 0 то факториал 0 равен 1!
+push 1
 out
-hlt
-
-check_c_null:
-push 0
-push rcx
-jne c_not_null
-push 10
-push 79
-push 78
-push 61
-push 78
-outc
-outc
-outc
-outc
-outc
-hlt
-
-c_not_null:
-push 10
-push 48
-push 61
-push 78
-outc
-outc
-outc
-outc
 hlt

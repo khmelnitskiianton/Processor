@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <SDL2/SDL.h>
+#include <unistd.h>
 
 #include "arrays.h"
 #include "type.h"
@@ -33,6 +35,7 @@ int process_asm (Cpu_t *myCpu)
 
 int do_command (Cpu_t* myCpu)
 {
+
     int command = *(myCpu -> actual_command);
     switch(command & ARG_FORMAT_COMMAND)
     {

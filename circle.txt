@@ -15,7 +15,7 @@ push rdx
 mul
 push rax
 add
-pop rcx         ;Вычислили элемент опретивки
+pop rcx         ;Вычислили элемент оперативки
 
 push rax
 push rdx
@@ -27,9 +27,9 @@ push rdx
 push 2
 div
 sub
-mul             ;Вычислили (x-9)^2
+mul             
 push 1.6
-mul
+mul             ;Вычислили (x - D/2)^2 * 1.6 коэфф
 
 push rbx
 push rdx

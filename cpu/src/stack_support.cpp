@@ -40,14 +40,14 @@ ON_HASH(
 ON_CANARY_ELSE( 
     void* new_place = nullptr;
     (stk -> capacity) = (stk -> capacity) * MULTIPLIER;                                                                                      
-    if ((new_place = realloc ((stk -> data), sizeof(Elem_t)*(stk -> capacity))) == nullptr)
+    if ((new_place = realloc ((stk -> data), sizeof(Elem_t)*((size_t) stk -> capacity))) == nullptr)
     {   
         fprintf(stdout,            "ERROR IN RECALLOC IN %s", __PRETTY_FUNCTION__);
         fprintf(stk -> file_write, "ERROR IN RECALLOC IN %s", __PRETTY_FUNCTION__);  
         abort();
     }
                                                  
-    mem_poison (new_place + sizeof(Elem_t)*(stk -> size), (stk -> capacity)-(stk -> size));                        
+    mem_poison (new_place + sizeof(Elem_t)*((size_t) stk -> size), (stk -> capacity)-(stk -> size));                        
 ON_HASH(
     rewrite_hash(stk, (const char*)(stk -> data));
 )
@@ -76,7 +76,7 @@ ON_HASH(
 ON_CANARY_ELSE(
     void* new_place = nullptr; 
     (stk -> capacity) = (stk -> capacity) / MULTIPLIER;
-    if ((new_place = realloc ((stk -> data), sizeof(Elem_t)*(stk -> capacity))) == nullptr)
+    if ((new_place = realloc ((stk -> data), sizeof(Elem_t)*((size_t) stk -> capacity))) == nullptr)
     {
         fprintf(stdout,            "ERROR IN RECALLOC IN %s", __PRETTY_FUNCTION__);
         fprintf(stk -> file_write, "ERROR IN RECALLOC IN %s", __PRETTY_FUNCTION__);  
@@ -258,7 +258,7 @@ int output_error (Stack_t *stk, const char* file, const size_t line, const char*
     {
         if (z % 2)
         {
-            bin_error += 1<<(element);
+            bin_error += (size_t) 1<<(element);
             fprintf(stk -> file_write, "1: [%s]\n", mass_of_errors[element]);
             if(element != 15) fatal_error = 1;
         }
@@ -372,7 +372,7 @@ ON_CANARY_IF(
     return sizeof(Canary_t)*2 + sizeof(Elem_t)*(stk -> capacity) + ((stk -> capacity)*sizeof(Elem_t)) % sizeof(Canary_t);
 )
 ON_CANARY_ELSE(
-    return sizeof(Elem_t)*(stk -> capacity);
+    return sizeof(Elem_t)*((size_t) (stk -> capacity));
 )
 }
 

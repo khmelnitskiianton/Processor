@@ -1,7 +1,7 @@
 #ifndef HEAD_H
 #define HEAD_H
 
-//TODO: sanitizer call if canaty or hash
+//TODO: sanitizer call if canary or hash
 
 #define ASSERT_MYSTACK 1
 #define ASSERT_CANARY  0

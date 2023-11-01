@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <math.h>
+#include <assert.h>
 
 #include "arrays.h"
 #include "type.h"
@@ -21,8 +22,8 @@ int Assembling(Asm_t *myAsm, int n_run)
     ON_FIRST_RUN(
         CleaningComments (str, SYMBOL_OF_COMMENT);
     )
-
-        if ((*str == '\0')||(SkipSpaces(str))) {continue;}
+        str = SkipSpaces(str);
+        if (!str) {continue;}
         
         CMDLine_t myCMDline = {};
         InitLine(&myCMDline);
@@ -47,6 +48,8 @@ int Assembling(Asm_t *myAsm, int n_run)
 
 int WriteCommandToBuf (CMDLine_t* myCMDline, Asm_t *myAsm)
 {
+    assert(myCMDline -> command);
+
     for (size_t i = 0; i < AMOUNT_OF_COMMANDS; i++)
     {
         if (!strncmp (myCMDline -> command, COMMANDS[i].command, myCMDline -> length_cmd))
@@ -120,7 +123,7 @@ int CompleteStructWithCMD (Parsing_t myActualWord, CMDLine_t* myCMDline)
             }
             else
             {
-                //TODO: dump print
+                printf("\n>>>>>UNKNOWN SYMBOL!!!<<<<<\n");
             }
         break;
         case 1:
@@ -203,7 +206,11 @@ int FillLabels (CMDLine_t* myCMDline, Asm_t* myAsm)
             break;
         }
     }
-    if (many_labels) return 0; //TODO: check for overflow array of labels
+    if (many_labels) 
+    {
+        printf("\n>>>>>OVERFLOW IN ARRAY OF LABELS!!!<<<<<\n");
+        return 0; 
+    }
     else return 1;
 }
 
@@ -216,7 +223,8 @@ int SearchingLabel (CMDLine_t* myCMDline, Asm_t *myAsm)
             return myAsm -> labels[i].address; 
         }
     }
-    return -1; //TODO: no matching labels
+    fprintf(stdout, ">>>>>NO MATCHING LABELS!!!!<<<<<");
+    return -1;
 }
 
 int ScanWithoutBrackets (Parsing_t myActualWord, CMDLine_t* myCMDline)

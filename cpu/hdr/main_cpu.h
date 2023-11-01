@@ -1,6 +1,8 @@
 #ifndef MAIN_SPU_H
 #define MAIN_SPU_H
 
+#include <SDL2/SDL.h>
+
 typedef struct BufferCpu {
     FILE*    file_in;
 
@@ -21,6 +23,8 @@ typedef struct Cpu {
     Elem_t      myMemory[MEMORY_LENGTH];
 
     FILE*       file_write;   
+    SDL_Renderer *renderer = NULL;
+    SDL_Window   *window   = NULL;
 
     Elem_t*     actual_command;
 

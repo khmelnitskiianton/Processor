@@ -123,14 +123,14 @@ int PrintAsmListing (CMDLine_t* myCMDline, Asm_t *myAsm, int bin_command)
     return no_arg;
 }
 
-int SkipSpaces (char* str)
+char* SkipSpaces (char* str)
 {
     while ((*str != '\0')&&(isspace(*str) != 0))
     {
         str++;
     }
-    if (*str == '\0') return 1;
-    return 0; 
+    if (*str == '\0') return NULL;
+    return str; 
 }
 
 int CheckNoArgs(char* str)

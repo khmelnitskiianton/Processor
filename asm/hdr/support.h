@@ -11,7 +11,7 @@ size_t  ParsingString           (Parsing_t* myActualWord, char symbol);
 int     CleaningComments        (char* str, char symbol_of_comment);
 int     isValue                 (char* arg);
 int     PrintAsmListing         (CMDLine_t* myCMDline, Asm_t *myAsm, int bin_command);
-int     SkipSpaces              (char* str);
+char*   SkipSpaces              (char* str);
 int     CheckNoArgs             (char* str);
 
 #endif

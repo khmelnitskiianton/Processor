@@ -7,6 +7,7 @@
 #include <stddef.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <SDL2/SDL.h>
 
 #include "arrays.h"
 #include "type.h"
@@ -16,7 +17,7 @@
 #include "support.h"
 #include "calc.h"
 
-int main(void)
+int main()
 {
     Cpu_t myCpu = {};
 
