@@ -82,7 +82,7 @@ jb for_y        ;for (y)
 push 0
 pop rbx
 
-draw
+drawf
 hlt
 
 change:         ;если вне окружности

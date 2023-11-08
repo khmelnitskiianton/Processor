@@ -1,45 +1,31 @@
-in
-pop rax
-push rax
-pop rcx
+main:
+    in
+    pop rax
 
-call check_n_null   ;случай если n = 0(а там будет 0! = 1)
+    call factorial
 
-call factorial      ;начинаем рекурсию
-end:
-push rcx            ;взяли итог
-out
+    push rbx
+    out
 hlt
 
-factorial:
-push rax
-push 1
-sub
-push 0
-je end              ;выходим если да, в rax лежит факториал
+factorial:              ; (rax) -> (rbx)
+    push rax
+    push 0
+    jne continue
+    push 1
+    pop rbx
+    ret
+    
+    continue:
+    push rax
 
-push rax            ;если все ок то производим умножение записываем результат в rcx
-push 1
-sub
-push rcx
-mul
-pop rcx
-
-push rax            ;уменьшаем n на 1
-push 1
-sub
-pop rax
-
-call factorial      ;рекурсия!!!
+    push rax
+    push 1
+    sub
+    pop rax
+    call factorial
+    
+    push rbx
+    mul
+    pop rbx 
 ret
-
-check_n_null:       ;проверка на 0
-push rax
-push 0
-je n_is_null
-ret
-
-n_is_null:          ;если 0 то факториал 0 равен 1!
-push 1
-out
-hlt

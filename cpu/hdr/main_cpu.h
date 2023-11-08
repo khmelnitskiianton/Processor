@@ -5,7 +5,6 @@
 
 typedef struct BufferCpu {
     FILE*    file_in;
-
     size_t   size_text;
     Elem_t*  text_buffer;
 } BufferCpu_t;
@@ -17,21 +16,18 @@ typedef struct ArgCMD {
 } ArgCMD_t;
 
 typedef struct Cpu {
-    Stack_t     myStack;
-    Stack_t     myStackReturns;
-    BufferCpu_t myBuffer;
-    Elem_t      myMemory[MEMORY_LENGTH];
+    Stack_t         myStack;
+    Stack_t         myStackReturns;
+    BufferCpu_t     myBuffer;
+    Elem_t          myMemory[MEMORY_LENGTH];
 
-    FILE*       file_write;   
-    SDL_Renderer *renderer = NULL;
-    SDL_Window   *window   = NULL;
+    FILE*           file_write;   
+    SDL_Renderer    *renderer = NULL;
+    SDL_Window      *window   = NULL;
 
-    Elem_t*     actual_command;
+    Elem_t*         actual_command;
 
-    Elem_t      rax;
-    Elem_t      rbx; 
-    Elem_t      rcx;
-    Elem_t      rdx; 
+    Elem_t          myRegs[AMOUNT_OF_REGISTERS];
 } Cpu_t;
 
 #endif 

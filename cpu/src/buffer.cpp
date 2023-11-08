@@ -18,28 +18,27 @@
 
 int BufferCtor (Cpu_t *myCpu)
 {
-    myCpu -> myBuffer.file_in  = file_open_read  ();
+    myCpu -> myBuffer.file_in  = file_open_read ();
 
-    assert(myCpu -> myBuffer.file_in);
+    assert (myCpu -> myBuffer.file_in);
 
-    myCpu -> myBuffer.size_text = text_size (myCpu -> myBuffer.file_in) + 1; 
-	myCpu -> myBuffer.text_buffer = (Elem_t*) calloc (myCpu -> myBuffer.size_text, sizeof (char));
+    myCpu -> myBuffer.size_text = text_size (myCpu -> myBuffer.file_in); 
 
-	assert(myCpu -> myBuffer.text_buffer);
+    assert (myCpu -> myBuffer.text_buffer = (Elem_t*) calloc (myCpu -> myBuffer.size_text, sizeof (char)));
 	
 	size_t result = fread (myCpu -> myBuffer.text_buffer, 1, myCpu -> myBuffer.size_text, myCpu -> myBuffer.file_in);
 
-	assert(result == (myCpu -> myBuffer.size_text - 1));
-
-	myCpu -> actual_command = myCpu -> myBuffer.text_buffer;
+    assert (result == (myCpu -> myBuffer.size_text));
+	
+    myCpu -> actual_command = myCpu -> myBuffer.text_buffer;
     return 1;
 }
 
 int BufferDtor (Cpu_t *myCpu)
 {
-    free(myCpu -> myBuffer.text_buffer);
+    free (myCpu -> myBuffer.text_buffer);
 
-	file_close(myCpu -> myBuffer.file_in);
+	file_close (myCpu -> myBuffer.file_in);
 	return 1;
 }
 
@@ -63,7 +62,7 @@ int MemoryDtor (Cpu_t *myCpu)
 
 size_t text_size (FILE *file_text)
 {
-	assert(file_text);
+	assert (file_text);
 
 	struct stat st = {};
     int fd = fileno (file_text); 
@@ -75,6 +74,6 @@ size_t text_size (FILE *file_text)
 FILE* file_open_read (void)
 {
     FILE *file_read = fopen (FILE_BIN, "rb");
-    assert(file_read);
+    assert (file_read);
     return file_read;
 }

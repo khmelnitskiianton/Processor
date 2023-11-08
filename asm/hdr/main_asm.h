@@ -39,7 +39,7 @@ typedef struct CMDLine {
 
 typedef struct BufferBin {
     Elem_t* bin_buffer;
-    int  n_elements;
+    int     n_elements;
 } BufferBin_t;
 
 typedef struct Asm {

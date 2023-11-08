@@ -47,7 +47,7 @@ ON_CANARY_ELSE(
         abort();
     }
                                                  
-    mem_poison (new_place + sizeof(Elem_t)*((size_t) stk -> size), (stk -> capacity)-(stk -> size));                        
+    mem_poison ((void*) ((char*) new_place + sizeof(Elem_t)*((size_t) stk -> size)), (stk -> capacity)-(stk -> size));                        
 ON_HASH(
     rewrite_hash(stk, (const char*)(stk -> data));
 )

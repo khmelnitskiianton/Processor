@@ -1,8 +1,8 @@
 #ifndef ARRAYS_H
 #define ARRAYS_H
 
-#define LISTING_ASM 0
-
+#define LISTING_ASM 1
+ 
 #if LISTING_ASM
 #define ON_LISTING(...) __VA_ARGS__
 #else
@@ -24,12 +24,6 @@ typedef struct BinCommand
 
 } BinCommand_t;
 
-typedef struct RegisterID
-{
-    const char* name;
-    const int   id;
-} RegID_t;
-
 enum arg_formats {
     ARG_FORMAT_COMMAND  = 0b000'11111,
     ARG_FORMAT_IMMED    = 0b001'00000,
@@ -46,25 +40,21 @@ constexpr BinCommand_t COMMANDS[] =
     #undef DEF_CMD
 };
 
-const RegID_t REGISTERS[] = {
-    {"rax", 1},
-    {"rbx", 2},
-    {"rcx", 3},
-    {"rdx", 4},
-};
-
-const int MEMORY_LENGTH    = 3000;
-const int WIDTH_OF_WINDOW  = 30;
-const int LENGTH_OF_WINDOW = 100;
-const int SIZE_OF_SQUARE   = 20;
-const int WIDTH_OF_SCREEN  = WIDTH_OF_WINDOW * SIZE_OF_SQUARE;
+//memory and drawing SDL------------------------------------------
+const int MEMORY_LENGTH     = 3000;
+const int WIDTH_OF_WINDOW   = 30;
+const int LENGTH_OF_WINDOW  = 100;
+const int SIZE_OF_SQUARE    = 20;
+const int WIDTH_OF_SCREEN   = WIDTH_OF_WINDOW * SIZE_OF_SQUARE;
 const int LENGTH_OF_SCREEN  = LENGTH_OF_WINDOW * SIZE_OF_SQUARE;
+const int SIZE_IN_CONSOLE   = 40;
+//----------------------------------------------------------------
 
+const int    AMOUNT_OF_REGISTERS = 5;
 const size_t AMOUNT_OF_LABELS    = 30;
 const size_t AMOUNT_OF_COMMANDS  = sizeof(COMMANDS)  / sizeof(BinCommand_t);
-const size_t AMOUNT_OF_REGISTERS = sizeof(REGISTERS) / sizeof(RegID_t);
 
-const int HAVE_BRACKETS = 1;
+const int  HAVE_BRACKETS = 1;
 const char SYMBOL_OF_COMMENT = ';';
 
 enum return_of_command {

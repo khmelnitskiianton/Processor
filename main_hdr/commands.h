@@ -39,14 +39,8 @@ DEF_CMD(pop, 1, 0b000'00010,
         }
         else  
         {
-            switch (myArgCMD.reg)
-            {
-                case 1:         pop(&(myCpu -> myStack), &(myCpu -> rax));          break;
-                case 2:         pop(&(myCpu -> myStack), &(myCpu -> rbx));          break;
-                case 3:         pop(&(myCpu -> myStack), &(myCpu -> rcx));          break;
-                case 4:         pop(&(myCpu -> myStack), &(myCpu -> rdx));          break;
-                default:        printf(">>>>>UNKNOWN REGISTER<<<<<");                break;
-            }       
+           if ((myArgCMD.reg >= 0) && (myArgCMD.reg <= AMOUNT_OF_REGISTERS)) pop(&(myCpu -> myStack), &(myCpu -> myRegs[myArgCMD.reg]));
+           else printf(">>>>>UNKNOWN REGISTER<<<<<");
         }
     }
 ON_LISTING_MEMORY(
@@ -346,19 +340,6 @@ DEF_CMD(draw, 21, 0b000'10111,
         isInit = 0;
     }
 
-    //for circle
-    /*
-    for (size_t i = 0; i < LENG_OF_WINDOW; i++)
-    {
-        for (size_t j = 0; j < LENG_OF_WINDOW; j++)
-        {
-            if ((i * LENG_OF_WINDOW + j) % LENG_OF_WINDOW == 0) fprintf(stdout, "\n");
-            if (myCpu -> myMemory[i * LENG_OF_WINDOW + j] == 0) fprintf (stdout, " . ");
-            if (myCpu -> myMemory[i * LENG_OF_WINDOW + j] == 1*N_DIGIT) fprintf (stdout, " 0 ");
-        }
-    }
-    */
-
     SDL_SetRenderDrawColor(myCpu -> renderer, 255, 255, 255, 255);
 
     for (size_t i = 0; i < WIDTH_OF_WINDOW; i++)
@@ -394,7 +375,20 @@ DEF_CMD(draw, 21, 0b000'10111,
     SDL_RenderClear(myCpu -> renderer);
 }
 )
-
+ 
+DEF_CMD(drawf, 22, 0b000'11000,
+{
+    for (size_t i = 0; i < SIZE_IN_CONSOLE; i++)
+    {
+        for (size_t j = 0; j < SIZE_IN_CONSOLE; j++)
+        {
+            if ((i * SIZE_IN_CONSOLE + j) % SIZE_IN_CONSOLE == 0) fprintf(stdout, "\n");
+            if (myCpu -> myMemory[i * SIZE_IN_CONSOLE + j] == 0) fprintf (stdout, " . ");
+            if (myCpu -> myMemory[i * SIZE_IN_CONSOLE + j] == 1*N_DIGIT) fprintf (stdout, " 0 ");
+        }
+    }
+}
+)
 
 DEF_CMD(hlt, 23, 0b000'11111, 
 {

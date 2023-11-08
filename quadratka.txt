@@ -5,23 +5,48 @@ pop rcx
 pop rbx
 pop rax                     ;вводим все в регистры
 
-call check_a_null           ;пошла проверка на не квадратное ур-ие
+push 0
+push rax
+jne a_not_null
+call check_b_null           ;пошла проверка на не квадратное ур-ие
+a_not_null_end:
+
+hlt
+
+a_not_null:
 
 call D                      ;если не ноль то начинаем вычислять D
 
 push 0
 push rdx
-jb no_roots                 ;если D < 0 то нет корней
+jb is_no_roots                 ;если D < 0 то нет корней
+is_no_roots_end:
 
 push 0
 push rdx
-je one_root                 ;Если D = 0 то один корень
+je is_one_root                 ;Если D = 0 то один корень
+is_one_root_end:
 
 push 0
 push rdx
-ja two_roots                ;Если D > 0 то два корня
+ja is_two_roots                ;Если D > 0 то два корня
+is_two_roots_end:
 
-hlt
+jmp a_not_null_end
+
+is_no_roots:
+call no_roots
+jmp is_no_roots_end
+
+is_one_root:
+call one_root
+jmp is_one_root_end
+
+is_two_roots:
+call two_roots
+jmp is_two_roots_end
+
+
 
 two_roots:
 call x1
@@ -36,7 +61,7 @@ outc
 outc
 out
 out
-hlt
+ret
 
 no_roots:
 push 10
@@ -47,7 +72,7 @@ outc
 outc
 outc
 outc
-hlt
+ret
 
 one_root:
 call x1
@@ -60,7 +85,7 @@ outc
 outc
 outc
 out
-hlt
+ret
 
 x1:
 push 0
@@ -101,19 +126,13 @@ sub
 pop rdx
 ret
 
-check_a_null:
-push 0
-push rax
-jne a_not_null
-call check_b_null
-a_not_null:
-ret
-
 check_b_null:
 push 0
 push rbx
 jne b_not_null
 call check_c_null
+b_not_null_end:
+ret
 
 b_not_null:
 push 0
@@ -130,15 +149,16 @@ outc
 outc
 outc
 out
-hlt
+jmp b_not_null_end
 
 check_c_null:
 push 0
 push rcx
 jne c_not_null
 push 10
-push 79
+push 70
 push 78
+push 73
 push 61
 push 78
 outc
@@ -146,7 +166,8 @@ outc
 outc
 outc
 outc
-hlt
+c_not_null_end:
+ret
 
 c_not_null:
 push 10
@@ -157,4 +178,4 @@ outc
 outc
 outc
 outc
-hlt
+jmp c_not_null_end 
