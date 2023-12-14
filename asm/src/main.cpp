@@ -6,7 +6,7 @@
 #include "buffer.h"
 #include "asm.h"
 
-int main(void)
+int main()
 { 
     Asm_t myAsm = {};
     

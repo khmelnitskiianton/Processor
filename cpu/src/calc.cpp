@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <SDL2/SDL.h>
+#include <unistd.h>
 
 #include "arrays.h"
 #include "type.h"
@@ -59,7 +61,7 @@ int do_command (Cpu_t* myCpu)
 int clean_buffer (void)
 {
     int ch = 0;                     
-    while ((ch = getchar ()) != '\n') {}   
+    while((ch = getchar ()) != '\n') {}   
     return 1;
 }
 
@@ -72,15 +74,8 @@ int GetArg (Cpu_t* myCpu, int command, ArgCMD_t* myArgCMD)
     if (command & ARG_FORMAT_REGISTER)
     { 
         myArgCMD -> reg = *(++(myCpu -> actual_command));
-
-        switch (myArgCMD -> reg)
-        {
-            case 1:         summ += (myCpu -> rax)/modifier;            break; 
-            case 2:         summ += (myCpu -> rbx)/modifier;            break;
-            case 3:         summ += (myCpu -> rcx)/modifier;            break;
-            case 4:         summ += (myCpu -> rdx)/modifier;            break;
-            default: fprintf(myCpu -> myStack.file_write,">>>>>UNKNOWN REGISTER<<<<<"); break;
-        }
+        if ((myArgCMD -> reg >= 0) && (myArgCMD -> reg <= AMOUNT_OF_REGISTERS)) summ += (myCpu -> myRegs[myArgCMD -> reg])/modifier;
+        else fprintf(myCpu -> myStack.file_write,">>>>>UNKNOWN REGISTER<<<<<");
     }
     if (command & ARG_FORMAT_IMMED)
     {

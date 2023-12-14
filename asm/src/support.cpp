@@ -10,28 +10,30 @@
 
 int get_reg_id (char reg)
 {
-    for (size_t i = 0; i < AMOUNT_OF_REGISTERS; i++)
+    int number = reg - 'a'; 
+    if ((number >= 0) && (number <= AMOUNT_OF_REGISTERS)) return number;
+    else
     {
-        if (reg == REGISTERS[i].name[1]) return REGISTERS[i].id;
+        return -1;
+        printf(">>>>>UNKNOWN REGISTER!!!<<<<<");
     }
-    return 0;
 }
 
 int isValue   (char* arg)
 {
-    if(isdigit(arg[0])) return 1;
+    if(isdigit (arg[0])) return 1;
     return 0;
 }
 
 int isCommand (char* arg)
 {
-    if (isalpha(arg[0])) return 1;
+    if (isalpha (arg[0])) return 1;
     return 0;
 }
 
 int isLabel (char* arg)
 {
-    if (strchr(arg, ':') != nullptr) return 1;
+    if (strchr (arg, ':') != nullptr) return 1;
     return 0;
 }
 
@@ -78,7 +80,7 @@ size_t LabelLength (CMDLine_t* myCMDline)
 size_t ParsingString (Parsing_t* myActualWord, char symbol)
 {
     size_t counter_symbols = 0;
-    while ((*(myActualWord -> start_word + counter_symbols) != symbol) && (*(myActualWord -> start_word + counter_symbols) != '\0'))
+    while((*(myActualWord -> start_word + counter_symbols) != symbol) && (*(myActualWord -> start_word + counter_symbols) != '\0'))
     {
         counter_symbols++;
     }
@@ -103,7 +105,7 @@ int CleaningComments (char* str, char symbol_of_comment)
 int PrintAsmListing (CMDLine_t* myCMDline, Asm_t *myAsm, int bin_command)
 {
     int no_arg = 1;
-    fprintf(myAsm -> file_listing,"\t|\t%d\t|\t\t[%p]\t\t{0b", (myAsm -> binCode).n_elements, (myCMDline -> command));
+    fprintf (myAsm -> file_listing,"\t|\t%d\t|\t\t[%p]\t\t{0b", (myAsm -> binCode).n_elements, (myCMDline -> command));
     int copy_bin_command = bin_command;
     int bin_command_array[8] = {};
     int n_bit = 7;
@@ -115,22 +117,22 @@ int PrintAsmListing (CMDLine_t* myCMDline, Asm_t *myAsm, int bin_command)
     }
     for (size_t j = 0; j < 8; j++)
     {
-        if (j == 2) fprintf(myAsm -> file_listing, "%d\'", bin_command_array[j]);
-        else fprintf(myAsm -> file_listing, "%d", bin_command_array[j]);
+        if (j == 2) fprintf (myAsm -> file_listing, "%d\'", bin_command_array[j]);
+        else fprintf (myAsm -> file_listing, "%d", bin_command_array[j]);
     }
-    fprintf(myAsm -> file_listing, "}\t\t\"%s\"", myCMDline -> command);
+    fprintf (myAsm -> file_listing, "}\t\t\"%s\"", myCMDline -> command);
 
     return no_arg;
 }
 
-int SkipSpaces (char* str)
+char* SkipSpaces (char* str)
 {
     while ((*str != '\0')&&(isspace(*str) != 0))
     {
         str++;
     }
-    if (*str == '\0') return 1;
-    return 0; 
+    if (*str == '\0') return NULL;
+    return str; 
 }
 
 int CheckNoArgs(char* str)

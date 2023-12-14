@@ -1,7 +1,6 @@
 DEF_CMD(push, 0, 0b000'00001, 
 {
     ArgCMD_t myArgCMD = {};
-
     myArgCMD.value = POISON_ELEMENT; 
 
     GetArg (myCpu, command, &myArgCMD);
@@ -36,18 +35,12 @@ DEF_CMD(pop, 1, 0b000'00010,
     {
         if (command & ARG_FORMAT_IMMED) 
         {
-            printf("\n>>>>>POP WITH NUMBER!!! WTF???<<<<<\n"); //TODO: dump
+            printf("\n>>>>>POP WITH NUMBER!!! WTF?!<<<<<\n"); 
         }
         else  
         {
-            switch (myArgCMD.reg)
-            {
-                case 1:         pop(&(myCpu -> myStack), &(myCpu -> rax));          break;
-                case 2:         pop(&(myCpu -> myStack), &(myCpu -> rbx));          break;
-                case 3:         pop(&(myCpu -> myStack), &(myCpu -> rcx));          break;
-                case 4:         pop(&(myCpu -> myStack), &(myCpu -> rdx));          break;
-                default:        printf(">>>>>UNKNOWN REGISTER<<<<<");                break;
-            }       
+           if ((myArgCMD.reg >= 0) && (myArgCMD.reg <= AMOUNT_OF_REGISTERS)) pop(&(myCpu -> myStack), &(myCpu -> myRegs[myArgCMD.reg]));
+           else printf(">>>>>UNKNOWN REGISTER<<<<<");
         }
     }
 ON_LISTING_MEMORY(
@@ -64,6 +57,11 @@ DEF_CMD(in, 2, 0b000'00011,
     {   
         clean_buffer ();
         printf ("\nWtf? Its not normal double number. Maybe it is infinite/NAN number or letters. Another attempt you piece of shit, hey you, MAAAAN!\n");
+    }
+    if (((num * N_DIGIT) < ((double) INT_MIN)) || ((num * N_DIGIT) > (double) INT_MAX))
+    {
+        printf("\n>>>>>THE SIZE OF THIS NUMBER SO BIG THAT OVERFLOW ME !!! GOODBYE <<<<<\n");
+        assert(0);
     }
     push (&(myCpu -> myStack), (int) (num * N_DIGIT));
 }
@@ -302,7 +300,7 @@ DEF_CMD(call, 18, 0b000'10100,
 {
     (myCpu -> actual_command)++;
 
-    push(&(myCpu -> myStackReturns), ((myCpu -> actual_command) - (myCpu -> myBuffer.text_buffer)));
+    push(&(myCpu -> myStackReturns), (Elem_t) ((myCpu -> actual_command) - (myCpu -> myBuffer.text_buffer)));
 
     Elem_t jump = *((myCpu -> actual_command));
     (myCpu -> actual_command) = (myCpu -> myBuffer.text_buffer + jump);
@@ -332,16 +330,71 @@ ON_LISTING_MEMORY(
 
 DEF_CMD(draw, 21, 0b000'10111,
 {
-    for (size_t i = 0; i < LENG_OF_WINDOW; i++)
+    static int isInit = 1;
+    if (isInit) 
     {
-        for (size_t j = 0; j < LENG_OF_WINDOW; j++)
+        SDL_Init(SDL_INIT_VIDEO);
+        SDL_CreateWindowAndRenderer(LENGTH_OF_SCREEN, WIDTH_OF_SCREEN, 0, &(myCpu -> window), &(myCpu -> renderer));
+        SDL_SetRenderDrawColor(myCpu -> renderer, 0, 0, 0, 0);
+        SDL_RenderClear(myCpu -> renderer);
+        isInit = 0;
+    }
+
+    SDL_SetRenderDrawColor(myCpu -> renderer, 255, 255, 255, 255);
+
+    for (size_t i = 0; i < WIDTH_OF_WINDOW; i++)
+    {
+        for (size_t j = 0; j < LENGTH_OF_WINDOW; j++)
         {
-            if ((i * LENG_OF_WINDOW + j) % LENG_OF_WINDOW == 0) fprintf(stdout, "\n");
-            if (myCpu -> myMemory[i * LENG_OF_WINDOW + j] == 0) fprintf (stdout, " . ");
-            if (myCpu -> myMemory[i * LENG_OF_WINDOW + j] == 1*N_DIGIT) fprintf (stdout, " 0 ");
+            if (myCpu -> myMemory[j + i * LENGTH_OF_WINDOW])
+            {
+                SDL_Rect rect1 = {(int) j * SIZE_OF_SQUARE, (int) i * SIZE_OF_SQUARE, SIZE_OF_SQUARE, SIZE_OF_SQUARE};
+                SDL_RenderFillRect(myCpu -> renderer, &rect1);
+            }
+        }
+    }
+    static SDL_Event e;
+    while(SDL_PollEvent(&e)) 
+    {
+        if(e.type == SDL_QUIT)
+        {
+            CpuDtor (myCpu);
+            SDL_DestroyRenderer(myCpu -> renderer);
+            SDL_DestroyWindow(myCpu -> window);
+            SDL_Quit();
+            exit(0);
+        }
+    }
+
+
+    SDL_RenderPresent(myCpu -> renderer);
+
+    SDL_SetRenderDrawColor(myCpu -> renderer, 0, 0, 0, 0);
+    usleep(75e3);
+
+    SDL_RenderClear(myCpu -> renderer);
+}
+)
+ 
+DEF_CMD(drawf, 22, 0b000'11000,
+{
+    for (size_t i = 0; i < SIZE_IN_CONSOLE; i++)
+    {
+        for (size_t j = 0; j < SIZE_IN_CONSOLE; j++)
+        {
+            if ((i * SIZE_IN_CONSOLE + j) % SIZE_IN_CONSOLE == 0) fprintf(stdout, "\n");
+            if (myCpu -> myMemory[i * SIZE_IN_CONSOLE + j] == 0) fprintf (stdout, " . ");
+            if (myCpu -> myMemory[i * SIZE_IN_CONSOLE + j] == 1*N_DIGIT) fprintf (stdout, " 0 ");
         }
     }
 }
 )
 
-DEF_CMD(hlt, 22, 0b000'11111, {return IF_HLT;})
+DEF_CMD(hlt, 23, 0b000'11111, 
+{
+    SDL_DestroyRenderer(myCpu -> renderer);
+    SDL_DestroyWindow(myCpu -> window);
+    SDL_Quit();    
+    return IF_HLT;
+}
+)

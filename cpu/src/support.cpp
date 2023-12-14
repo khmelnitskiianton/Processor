@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <SDL2/SDL.h>
 
 #include "arrays.h"
 #include "type.h"
@@ -39,17 +40,17 @@ int CpuDtor(Cpu_t* myCpu)
 int PrintMemoryListing (Cpu_t* myCpu)
 {
     size_t n_element = 0;
-    fprintf(myCpu -> file_write, "\nMEMORY: [");
+    fprintf (myCpu -> file_write, "\nMEMORY: [");
     while (n_element < MEMORY_LENGTH)
     {
-        fprintf(myCpu -> file_write, "|%d|", myCpu -> myMemory[n_element]);
+        fprintf (myCpu -> file_write, "|%d|", myCpu -> myMemory[n_element]);
         if (myCpu -> myMemory[n_element] == POISON_ELEMENT)
         {
             break;
         }
         n_element++;
     }
-    fprintf(myCpu -> file_write, "]\n");
-    fprintf(myCpu -> file_write, DIVIDER);
+    fprintf (myCpu -> file_write, "]\n");
+    fprintf (myCpu -> file_write, DIVIDER);
     return 1;
 }
