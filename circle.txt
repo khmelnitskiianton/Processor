@@ -15,7 +15,7 @@ push rdx
 mul
 push rax
 add
-pop rcx         ;Вычислили элемент оперативки
+pop rcx
 
 push rax
 push rdx
@@ -27,9 +27,9 @@ push rdx
 push 2
 div
 sub
-mul             
+mul
 push 1.6
-mul             ;Вычислили (x - D/2)^2 * 1.6 коэфф
+mul
 
 push rbx
 push rdx
@@ -41,7 +41,7 @@ push rdx
 push 2
 div
 sub
-mul             ;Вычислили (y-9)^2
+mul
 
 add
 push rdx
@@ -54,38 +54,38 @@ push 2
 div
 push 1.5
 sub
-mul 
-jae change      ;Сравниваем
-push 0          ;Если вне окружности то 0
+mul
+jae change
+push 0
 pop [rcx]
 back:
 
 push 1
 push rax
 add
-pop rax         ;x++
+pop rax
 
 push rdx
-push rax        ;x < 30
-jb for_x        
+push rax
+jb for_x
 push 0
 pop rax
 
 push 1
 push rbx
 add
-pop rbx         ;y++
+pop rbx
 
 push rdx
-push rbx        ;y < 30
-jb for_y        ;for (y)
+push rbx
+jb for_y
 push 0
 pop rbx
 
 drawf
 hlt
 
-change:         ;если вне окружности
+change:
 push 1
 pop [rcx]
 jmp back
