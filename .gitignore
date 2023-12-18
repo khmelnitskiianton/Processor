@@ -12,24 +12,23 @@ CMakeLists.txt
 cmake_install.cmake
 Makefile
 
-listing.txt
-log.txt
-input_bin.txt
-
 asm/CMakeFiles
 asm/CMakeCache.txt
 asm/CMakeLists.txt
 asm/cmake_install.cmake
 asm/Makefile
+asm/asm
 
 cpu/CMakeFiles
 cpu/CMakeCache.txt
 cpu/CMakeLists.txt
 cpu/cmake_install.cmake
 cpu/Makefile
+cpu/cpu
 
 disasm/CMakeFiles
 disasm/CMakeCache.txt
 disasm/CMakeLists.txt
 disasm/cmake_install.cmake
 disasm/Makefile
+disasm/disasm
