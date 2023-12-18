@@ -55,7 +55,6 @@ int main(int argc, char* argv[])
 FILE* file_open_read (void)
 {
     FILE *file_read = fopen ("bad_apple_clean.txt", "r");
-    assert(file_read);
     return file_read;
 }
 

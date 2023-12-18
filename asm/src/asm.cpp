@@ -125,6 +125,7 @@ int CompleteStructWithCMD (Parsing_t myActualWord, CMDLine_t* myCMDline)
             }
         break;
         case 1:
+        {
             int scan_done = 0; 
             if (strchr (myActualWord.start_word, '[') != nullptr)
             {
@@ -142,7 +143,9 @@ int CompleteStructWithCMD (Parsing_t myActualWord, CMDLine_t* myCMDline)
             {
                 myCMDline -> cmd_label = myActualWord.start_word;
             }
+        }
         break;
+        default: break;
     }
     return 0;
 }
@@ -231,15 +234,15 @@ int ScanWithoutBrackets (Parsing_t myActualWord, CMDLine_t* myCMDline)
     myCMDline -> brackets = 0;
     int n_1 = -1;
     int n_2 = -1;
-    int ch  = 0;
+    char ch[10] = {};
     int return_amount = -1;
 
-    return_amount = sscanf(myActualWord.start_word, " %nr%[a-z]x%n + %lf", &n_1, &ch, &n_2, &(double_number));
+    return_amount = sscanf(myActualWord.start_word, " %nr%1[a-z]x%n + %lf", &n_1, ch, &n_2, &(double_number));
     if (return_amount == 2)
     {
         if ((n_2 - n_1) == 3) 
         { 
-            (myCMDline -> reg) = ch;
+            (myCMDline -> reg) = *ch;
         }
         else 
         {   
@@ -256,12 +259,12 @@ int ScanWithoutBrackets (Parsing_t myActualWord, CMDLine_t* myCMDline)
         return 1;
     }
 
-    return_amount = sscanf (myActualWord.start_word, " %nr%[a-e]x%n", &n_1, &ch, &n_2);
+    return_amount = sscanf (myActualWord.start_word, " %nr%1[a-z]x%n", &n_1, ch, &n_2);
     if (return_amount == 1)
     {
         if ((n_2 - n_1) == 3) 
         { 
-            (myCMDline -> reg) = ch;
+            (myCMDline -> reg) = *ch;
         }
         else 
         {   
@@ -288,15 +291,15 @@ int ScanWithBrackets (Parsing_t myActualWord, CMDLine_t* myCMDline)
     int number = -1;
     int n_1 = -1;
     int n_2 = -1;
-    int ch  = 0;
+    char ch[10] = {};
     int return_amount = -1;
-    
-    return_amount = sscanf (myActualWord.start_word, " %n[r%[a-z]x%n + %d]",  &n_1, &ch, &n_2, &number);
+
+    return_amount = sscanf (myActualWord.start_word, " %n[r%1[a-z]x%n + %d]",  &n_1, ch, &n_2, &number);
     if (return_amount == 2)
     {
         if ((n_2 - n_1) == 4)
         {
-            myCMDline -> reg = ch;
+            myCMDline -> reg = *ch;
             myCMDline -> value = number;
         }
         else 
@@ -307,13 +310,12 @@ int ScanWithBrackets (Parsing_t myActualWord, CMDLine_t* myCMDline)
         }
         return 1;
     }
-
-    return_amount = sscanf (myActualWord.start_word, " %n[r%[a-z]x]%n", &n_1, &ch, &n_2);
+    return_amount = sscanf (myActualWord.start_word, " %n[r%1[a-z]x]%n", &n_1, ch, &n_2);
     if (return_amount == 1)
     {
         if ((n_2 - n_1) == 5)
         {
-            myCMDline -> reg = ch;
+            myCMDline -> reg = *ch;
         }
         else
         {

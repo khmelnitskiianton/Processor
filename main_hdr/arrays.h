@@ -1,7 +1,7 @@
 #ifndef ARRAYS_H
 #define ARRAYS_H
 
-#define LISTING_ASM 1
+#define LISTING_ASM 0
  
 #if LISTING_ASM
 #define ON_LISTING(...) __VA_ARGS__
