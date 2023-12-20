@@ -48,6 +48,9 @@ My program took code on my asm from `input_text.txt`.
 
 In processor I have stack, registers(`rax` - `rex`), RAM 
 
+> After no argument functions, dont write any spaces/comments! (it is feature)\
+> In another cases, you can write comments after `;` with any spaces
+
 **Functions:** (in `main_hdr/commands.h`)
 
 *push/pop*
