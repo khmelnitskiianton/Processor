@@ -27,9 +27,9 @@ push rdx
 push 2
 div
 sub
-mul             
+mul
 push 1.6
-mul             ;Вычислили (x - D/2)^2 * 1.6 коэфф
+mul
 
 push rbx
 push rdx
@@ -41,7 +41,7 @@ push rdx
 push 2
 div
 sub
-mul             ;Вычислили (y-9)^2
+mul
 
 add
 push rdx
@@ -54,7 +54,7 @@ push 2
 div
 push 1.5
 sub
-mul 
+mul
 jae change      ;Сравниваем
 push 0          ;Если вне окружности то 0
 pop [rcx]
