@@ -8,6 +8,7 @@ input_bin.txt
 input_text.txt
 log.txt
 listing.txt
+bin.txt
 
 CMakeFiles
 CMakeCache.txt
