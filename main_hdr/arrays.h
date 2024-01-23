@@ -68,8 +68,6 @@ enum return_of_command {
 
 #define DIVIDER "-------------------------------------------------------------------------------------------------------------\n"
 
-#define FILE_TEXT "./input_text.txt"
-#define FILE_BIN "./input_bin.txt"
 #define FILE_LIST "./listing.txt"
 #define FILE_LOG "./log.txt"
  

@@ -1,1 +1,1 @@
-./asm/asm && ./cpu/cpu
+./asm/asm $1.txt bin.txt && ./cpu/cpu bin.txt

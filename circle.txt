@@ -2,44 +2,36 @@ push 0
 pop rax
 push 0
 pop rbx
-push 40
+push 30
 pop rdx
 
-;rax = x | rbx = y | rcx = element | rdx = width
+;rax = x | rbx = y | rcx = element | rdx = width 
 
 for_y:
 for_x:
 
 push rbx
-push rdx
+push 40
 mul
 push rax
 add
 pop rcx         ;Вычислили элемент оперативки
 
 push rax
-push rdx
-push 2
-div
+push 20
 sub
 push rax
-push rdx
-push 2
-div
+push 20
 sub
 mul
 push 1.6
 mul
 
 push rbx
-push rdx
-push 2
-div
+push 20
 sub
 push rbx
-push rdx
-push 2
-div
+push 20
 sub
 mul
 
@@ -65,7 +57,7 @@ push rax
 add
 pop rax         ;x++
 
-push rdx
+push 40
 push rax        ;x < 30
 jb for_x        
 push 0
@@ -76,7 +68,7 @@ push rbx
 add
 pop rbx         ;y++
 
-push rdx
+push 40
 push rbx        ;y < 30
 jb for_y        ;for (y)
 push 0

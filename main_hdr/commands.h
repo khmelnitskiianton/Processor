@@ -60,8 +60,7 @@ DEF_CMD(in, 2, 0b000'00011,
     }
     if (((num * N_DIGIT) < ((double) INT_MIN)) || ((num * N_DIGIT) > (double) INT_MAX))
     {
-        printf("\n>>>>>THE SIZE OF THIS NUMBER SO BIG THAT OVERFLOW ME !!! GOODBYE <<<<<\n");
-        assert(0);
+        USER_ERROR(0, VALUE_OUT_OF_RANGE, exit(0))
     }
     push (&(myCpu -> myStack), (int) (num * N_DIGIT));
 }
@@ -378,9 +377,9 @@ DEF_CMD(draw, 21, 0b000'10111,
  
 DEF_CMD(drawf, 22, 0b000'11000,
 {
-    for (size_t i = 0; i < SIZE_IN_CONSOLE; i++)
+    for (int i = 0; i < SIZE_IN_CONSOLE; i++)
     {
-        for (size_t j = 0; j < SIZE_IN_CONSOLE; j++)
+        for (int j = 0; j < SIZE_IN_CONSOLE; j++)
         {
             if ((i * SIZE_IN_CONSOLE + j) % SIZE_IN_CONSOLE == 0) fprintf(stdout, "\n");
             if (myCpu -> myMemory[i * SIZE_IN_CONSOLE + j] == 0) fprintf (stdout, " . ");

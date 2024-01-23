@@ -5,7 +5,7 @@ Its my simple processor!
 It consists of my assembler and my spu and can process many interesting codes!
 
 You can see 3 example programs on my asm: 
-1. `qudratka.txt` - code of quadratic solver
+1. `quadratka.txt` - code of quadratic solver
 2. `circle.txt` - code that draw circle in console
 3. `factorial.txt` - code of recursive factorial
 4. `bad_apple.txt` - code that draws BadApple movie in window with SDL
@@ -23,7 +23,7 @@ make run
 ```
 2. You will have file `bad_apple_asm.txt` in ./bad_apple
 3. Change its name to `input_text.txt` and copy to main folder!
-4. Then start program with `./processor.bat`
+4. Then start program with `./processor.bat bad_apple.txt`
 
 *Possible Problems:*
 > If running bad apple more than 10 sec - than check in `main_hdr/arrays.h` logs are turn off, turn off and recompile
@@ -56,7 +56,7 @@ git clone https://github.com/khmelnitskiianton/Processor.git
 cd ./Processor
 cmake .
 make
-./processor.bat
+./processor.bat <name_of_file_where_read_code>
 ```
 
 ## Extra programs
@@ -69,7 +69,7 @@ sudo apt install libsdl2-dev -y
 
 ## Using
 
-My program took code on my asm from `input_text.txt`.
+My program took code on my asm from text file.
 
 In processor I have stack, registers(`rax` - `rex`), RAM 
 

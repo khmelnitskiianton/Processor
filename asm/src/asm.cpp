@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <math.h>
-#include <assert.h>
 
 #include "arrays.h"
 #include "type.h"
@@ -11,6 +10,7 @@
 #include "support.h"
 #include "buffer.h"
 #include "asm.h"
+#include "myassert.h"
 
 int Assembling(Asm_t *myAsm, int n_run)
 {
@@ -46,7 +46,7 @@ int Assembling(Asm_t *myAsm, int n_run)
 
 int WriteCommandToBuf (CMDLine_t* myCMDline, Asm_t *myAsm)
 {
-    assert(myCMDline -> command);
+    MYASSERT(myCMDline -> command, BAD_POINTER_PASSED_IN_FUNC, return 0)
 
     for (size_t i = 0; i < AMOUNT_OF_COMMANDS; i++)
     {
@@ -246,15 +246,12 @@ int ScanWithoutBrackets (Parsing_t myActualWord, CMDLine_t* myCMDline)
         }
         else 
         {   
-            (myCMDline -> reg) = 0;
-            printf(">>>>>Bad Name Of Register!!!<<<<<\n");
-            assert(0);
+            USER_ERROR(0, BAD_NAME_OF_REGISTER, exit(0))
         }
         if (!isnan (double_number)) myCMDline -> value = (int) (double_number * N_DIGIT);
         else 
         {
-            printf(">>>>>VALUE OUT OF RANGE<<<<<");
-            assert(0);
+            USER_ERROR(0, VALUE_OUT_OF_RANGE, exit(0))
         }
         return 1;
     }
@@ -269,8 +266,7 @@ int ScanWithoutBrackets (Parsing_t myActualWord, CMDLine_t* myCMDline)
         else 
         {   
             (myCMDline -> reg) = 0;
-            printf(">>>>>Bad Name Of Register!!!<<<<<\n");
-            assert(0);
+            USER_ERROR(0, BAD_NAME_OF_REGISTER, exit(0))
         }
         return 1;
     }
@@ -305,8 +301,7 @@ int ScanWithBrackets (Parsing_t myActualWord, CMDLine_t* myCMDline)
         else 
         {
             (myCMDline -> reg) = 0;
-            printf(">>>>>Bad Name Of Register!!!<<<<<\n");
-            assert(0);
+            USER_ERROR(0, BAD_NAME_OF_REGISTER, exit(0))
         }
         return 1;
     }
@@ -320,8 +315,7 @@ int ScanWithBrackets (Parsing_t myActualWord, CMDLine_t* myCMDline)
         else
         {
             (myCMDline -> reg) = 0;
-            printf(">>>>>Bad Name Of Register!!!<<<<<\n");
-            assert(0);
+            USER_ERROR(0, BAD_NAME_OF_REGISTER, exit(0))
         }
         return 1;
     }    
