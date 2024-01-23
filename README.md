@@ -5,10 +5,34 @@ Its my simple processor!
 It consists of my assembler and my spu and can process many interesting codes!
 
 You can see 3 example programs on my asm: 
-1. `qudratka.txt` - code of quadratic solver
+1. `quadratka.txt` - code of quadratic solver
 2. `circle.txt` - code that draw circle in console
 3. `factorial.txt` - code of recursive factorial
-4. `bad_apple.txt` - code that draws BadApple movie in window with SDL(you need to switch branch)
+4. `bad_apple.txt` - code that draws BadApple movie in window with SDL
+
+## Running BadApple ##
+
+Git have an edge of file with 100 MB, thats why you need to generate asm code for BadApple with hands(it costs 122 MB and have 10 million commands!)
+
+1. After installation you need to generate asm code and put it in main:
+
+```c
+cd ./bad_apple
+make start
+make run
+```
+2. You will have file `bad_apple_asm.txt` in ./bad_apple
+3. Change its name to `input_text.txt` and copy to main folder!
+4. Then start program with `./processor.bat bad_apple.txt`
+
+*Possible Problems:*
+> If running bad apple more than 10 sec - than check in `main_hdr/arrays.h` logs are turn off, turn off and recompile
+
+> Sanitizer of memory after BadApple is OK - it is problem in SDL
+
+> Warnings while compiling from sanitizer
+
+
 
 ## Table of Contents
 
@@ -26,12 +50,13 @@ To start program you need to use CMake and run program
 2.  Compile CMake, write command in main directory in repo
 3.  Run CMake (compile program), write command in main directory in repo
 4.  Run program(before you need to create this file) 
+
 ```c
 git clone https://github.com/khmelnitskiianton/Processor.git
 cd ./Processor
 cmake .
 make
-./processor.bat
+./processor.bat <name_of_file_where_read_code>
 ```
 
 ## Extra programs
@@ -44,11 +69,11 @@ sudo apt install libsdl2-dev -y
 
 ## Using
 
-My program took code on my asm from `input_text.txt`.
+My program took code on my asm from text file.
 
 In processor I have stack, registers(`rax` - `rex`), RAM 
 
-> After no argument functions, dont write any spaces/comments! (it is feature)\
+> After functions that consist of 1 word, dont write any spaces/comments! (it is feature)\
 > In another cases, you can write comments after `;` with any spaces
 
 **Functions:** (in `main_hdr/commands.h`)

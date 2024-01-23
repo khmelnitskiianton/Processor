@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <assert.h>
 #include <string.h>
 #include <limits.h>
 #include <math.h>
@@ -9,6 +8,7 @@
 #include <SDL2/SDL.h>
 #include <unistd.h>
 
+#include "myassert.h"
 #include "arrays.h"
 #include "type.h"
 #include "stack_main.h"
@@ -21,6 +21,8 @@
 
 int process_asm (Cpu_t *myCpu)
 {
+    MYASSERT(myCpu, BAD_POINTER_PASSED_IN_FUNC, return 0)
+    
     int checkOk = 1;
     int return_value = 0;
     while (checkOk)
@@ -35,6 +37,8 @@ int process_asm (Cpu_t *myCpu)
 
 int do_command (Cpu_t* myCpu)
 {
+    MYASSERT(myCpu, BAD_POINTER_PASSED_IN_FUNC, return 0)
+    MYASSERT(myCpu -> actual_command, BAD_POINTER_PASSED_IN_FUNC, return 0)
     int command = *(myCpu -> actual_command);
     switch(command & ARG_FORMAT_COMMAND)
     {

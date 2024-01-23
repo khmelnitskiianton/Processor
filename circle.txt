@@ -2,44 +2,36 @@ push 0
 pop rax
 push 0
 pop rbx
-push 40
+push 30
 pop rdx
 
-;rax = x | rbx = y | rcx = element | rdx = width
+;rax = x | rbx = y | rcx = element | rdx = width 
 
 for_y:
 for_x:
 
 push rbx
-push rdx
+push 40
 mul
 push rax
 add
-pop rcx
+pop rcx         ;Вычислили элемент оперативки
 
 push rax
-push rdx
-push 2
-div
+push 20
 sub
 push rax
-push rdx
-push 2
-div
+push 20
 sub
 mul
 push 1.6
 mul
 
 push rbx
-push rdx
-push 2
-div
+push 20
 sub
 push rbx
-push rdx
-push 2
-div
+push 20
 sub
 mul
 
@@ -55,37 +47,37 @@ div
 push 1.5
 sub
 mul
-jae change
-push 0
+jae change      ;Сравниваем
+push 0          ;Если вне окружности то 0
 pop [rcx]
 back:
 
 push 1
 push rax
 add
-pop rax
+pop rax         ;x++
 
-push rdx
-push rax
-jb for_x
+push 40
+push rax        ;x < 30
+jb for_x        
 push 0
 pop rax
 
 push 1
 push rbx
 add
-pop rbx
+pop rbx         ;y++
 
-push rdx
-push rbx
-jb for_y
+push 40
+push rbx        ;y < 30
+jb for_y        ;for (y)
 push 0
 pop rbx
 
 drawf
 hlt
 
-change:
+change:         ;если вне окружности
 push 1
 pop [rcx]
 jmp back

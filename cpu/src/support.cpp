@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <assert.h>
 #include <string.h>
 #include <limits.h>
 #include <math.h>
@@ -17,10 +16,13 @@
 #include "calc.h"
 #include "buffer.h"
 #include "support.h"
+#include "myassert.h"
 
-int CpuCtor(Cpu_t* myCpu)
+int CpuCtor(Cpu_t* myCpu, const char* data_read)
 {
-    BufferCtor (myCpu);
+    MYASSERT(myCpu, BAD_POINTER_PASSED_IN_FUNC, return 0)
+
+    BufferCtor (myCpu, data_read);
     StackCtor  (&(myCpu -> myStack));
     StackCtor  (&(myCpu -> myStackReturns));
     myCpu -> file_write = myCpu -> myStack.file_write;
@@ -30,6 +32,8 @@ int CpuCtor(Cpu_t* myCpu)
 
 int CpuDtor(Cpu_t* myCpu)
 {
+    MYASSERT(myCpu, BAD_POINTER_PASSED_IN_FUNC, return 0)
+
     BufferDtor (myCpu);
     StackDtor  (&(myCpu -> myStack));
     StackDtor  (&(myCpu -> myStackReturns));
@@ -39,6 +43,8 @@ int CpuDtor(Cpu_t* myCpu)
 
 int PrintMemoryListing (Cpu_t* myCpu)
 {
+    MYASSERT(myCpu, BAD_POINTER_PASSED_IN_FUNC, return 0)
+    
     size_t n_element = 0;
     fprintf (myCpu -> file_write, "\nMEMORY: [");
     while (n_element < MEMORY_LENGTH)

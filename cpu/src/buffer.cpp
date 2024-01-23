@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <assert.h>
 #include <string.h>
 #include <limits.h>
 #include <math.h>
@@ -14,28 +13,31 @@
 #include "stack_base.h"
 #include "stack_support.h"
 #include "main_cpu.h"
+#include "myassert.h"
 #include "buffer.h"
 
-int BufferCtor (Cpu_t *myCpu)
+int BufferCtor (Cpu_t *myCpu, const char* data_read)
 {
-    myCpu -> myBuffer.file_in  = file_open_read ();
+    MYASSERT(myCpu, BAD_POINTER_PASSED_IN_FUNC, return 0)
 
-    assert (myCpu -> myBuffer.file_in);
+    myCpu -> myBuffer.file_in  = file_open_read (data_read);
+    MYASSERT(myCpu -> myBuffer.file_in, NULL_POINTER_IN_OPEN_FILE, return 0)
 
     myCpu -> myBuffer.size_text = text_size (myCpu -> myBuffer.file_in); 
-
-    assert (myCpu -> myBuffer.text_buffer = (Elem_t*) calloc (myCpu -> myBuffer.size_text, sizeof (char)));
+    myCpu -> myBuffer.text_buffer = (Elem_t*) calloc (myCpu -> myBuffer.size_text, sizeof (char));
+    MYASSERT(myCpu -> myBuffer.text_buffer, BAD_CALLOC, return 0)
 	
 	size_t result = fread (myCpu -> myBuffer.text_buffer, 1, myCpu -> myBuffer.size_text, myCpu -> myBuffer.file_in);
+    MYASSERT(result == (myCpu -> myBuffer.size_text), BAD_FREAD, return 0)
 
-    assert (result == (myCpu -> myBuffer.size_text));
-	
     myCpu -> actual_command = myCpu -> myBuffer.text_buffer;
     return 1;
 }
 
 int BufferDtor (Cpu_t *myCpu)
 {
+    MYASSERT(myCpu, BAD_POINTER_PASSED_IN_FUNC, return 0)
+
     free (myCpu -> myBuffer.text_buffer);
 
 	file_close (myCpu -> myBuffer.file_in);
@@ -44,6 +46,7 @@ int BufferDtor (Cpu_t *myCpu)
 
 int MemoryCtor (Cpu_t *myCpu)
 {
+    MYASSERT(myCpu, BAD_POINTER_PASSED_IN_FUNC, return 0)
     for (size_t i = 0; i < MEMORY_LENGTH; i++)
     {
         myCpu -> myMemory[i] = POISON_ELEMENT;
@@ -53,6 +56,7 @@ int MemoryCtor (Cpu_t *myCpu)
 
 int MemoryDtor (Cpu_t *myCpu)
 {
+    MYASSERT(myCpu, BAD_POINTER_PASSED_IN_FUNC, return 0)
     for (size_t i = 0; i < MEMORY_LENGTH; i++)
     {
         myCpu -> myMemory[i] = POISON_ELEMENT;
@@ -62,18 +66,20 @@ int MemoryDtor (Cpu_t *myCpu)
 
 size_t text_size (FILE *file_text)
 {
-	assert (file_text);
+	MYASSERT(file_text, BAD_POINTER_PASSED_IN_FUNC, return 0)
 
 	struct stat st = {};
     int fd = fileno (file_text); 
     fstat (fd, &st);
     size_t size_text = (size_t) st.st_size;
+
+    USER_ERROR(size_text, EMPTY_FILE, exit(0))
 	return size_text;
 }
 
-FILE* file_open_read (void)
+FILE* file_open_read (const char* data_read)
 {
-    FILE *file_read = fopen (FILE_BIN, "rb");
-    assert (file_read);
+    FILE *file_read = fopen (data_read, "rb");
+    MYASSERT(data_read, NULL_POINTER_IN_OPEN_FILE, return NULL)
     return file_read;
 }
